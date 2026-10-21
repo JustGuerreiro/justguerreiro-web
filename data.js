@@ -2,20 +2,22 @@
 export const SUPABASE_URL = "https://ykqwudzfhtuhxnkpygxj.supabase.co";
 export const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrcXd1ZHpmaHR1aHhua3B5Z3hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MjA4NjksImV4cCI6MjEwODA5Njg2OX0.iypdLyh5cJe8_mK-pHhz6zHUHZLWcYu6-lUO1lpBNDk";
 
-export const TEST_USERS = {
+export const USERS = {
   "justguerreiro": {
     username: "JustGuerreiro",
-    password: "123",
+    password: "123", // Podes alterar a tua password aqui
     displayName: "Diogo Guerreiro",
     role: "admin",
-    avatar: "JG"
+    avatar: "JG",
+    defaultSubview: "shelf" // Abre Biblioteca Cultural por defeito
   },
   "amor": {
     username: "Amor",
-    password: "123",
-    displayName: "Minha Namorada",
+    password: "123", // Podes alterar a password dela aqui
+    displayName: "Amor",
     role: "partner",
-    avatar: "❤️"
+    avatar: "❤️",
+    defaultSubview: "couple" // Abre Espaço de Casal por defeito
   }
 };
 
@@ -23,9 +25,9 @@ export const PROFILE_CONTACT = {
   name: "Diogo Guerreiro",
   handle: "JustGuerreiro",
   location: "Portimão, Portugal",
-  role: "Engenharia Informática // Software, Sistemas & Multimédia",
-  bio: "Estudante de Engenharia Informática focado no desenvolvimento de aplicações estruturadas, sistemas embebidos com microcontroladores e experiências interativas. Fora do código, dedico-me à fotografia, edição de vídeo/VFX e música.",
-  email: "contacto@justguerreiro.dev", // Podes colocar aqui o teu email real
+  role: "Engenharia Informática // Software, Web & Multimédia",
+  bio: "Estudante finalista de Engenharia Informática focado em engenharia de software, arquitetura de aplicações desktop/mobile e desenvolvimento web. Fora do código, dedico-me à produção de vídeo, edição criativa, fotografia e música.",
+  email: "contacto@justguerreiro.dev",
   github: "https://github.com/JustGuerreiro",
   linkedin: "https://linkedin.com/in/",
   instagram: "https://instagram.com/"
@@ -50,13 +52,13 @@ export const INITIAL_PROJECTS = [
     title: "OmniVault",
     category: "Arquitetura & Desktop",
     image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?auto=format&fit=crop&w=800&q=80",
-    description: "Aplicação desktop focada em segurança e organização modular de dados, com arquitetura escalável e controlo de versões estruturado.",
-    problem: "Necessidade de centralizar dados sensíveis e ficheiros locais numa aplicação desktop segura, rápida e independente da cloud.",
-    architecture: "Arquitetura em camadas com separação estrita entre UI, lógica de domínio e persistência encriptada, desenhada para escalar em fases.",
-    challenges: "Estruturação do roadmap técnico, definição de módulos isolados e configuração do fluxo de trabalho Git para manutenção a longo prazo.",
-    stack: ["C#", ".NET", "Arquitetura", "Git"],
+    description: "Aplicação desktop focada em produtividade segura, automação de sistema e organização modular de dados.",
+    problem: "Necessidade de centralizar dados sensíveis, fluxos de trabalho e automação local numa aplicação desktop rápida e segura.",
+    architecture: "Arquitetura modular combinando Electron, Node.js e backend local em Python FastAPI com controlo de versões estruturado.",
+    challenges: "Comunicação eficiente entre processos (IPC), isolamento de módulos e definição de uma interface fluida.",
+    stack: ["Electron", "Node.js", "Python FastAPI", "Git"],
     status: "Em Desenvolvimento",
-    link: "https://github.com"
+    link: "https://github.com/JustGuerreiro"
   },
   {
     id: 2,
@@ -65,75 +67,53 @@ export const INITIAL_PROJECTS = [
     image: "https://images.unsplash.com/photo-1512941937669-90a1b58e7e9c?auto=format&fit=crop&w=800&q=80",
     description: "Aplicação Android nativa para tradução rápida com interface reativa em Jetpack Compose e suporte a fundos de vídeo dinâmicos.",
     problem: "Criar uma experiência de tradução mobile imediata e visualmente imersiva sem bloquear a thread principal da interface.",
-    architecture: "Desenvolvido em Kotlin com Jetpack Compose, utilizando gestão de estado reativa e ciclo de vida otimizado para reprodução de vídeo em background.",
-    challenges: "Garantir que o vídeo de fundo em loop não degradava a performance da UI nem o consumo de memória em diferentes dispositivos Android.",
+    architecture: "Desenvolvido em Kotlin com Jetpack Compose, utilizando gestão de estado reativa e ciclo de vida otimizado para reprodução de vídeo.",
+    challenges: "Garantir que o vídeo de fundo em loop não degradava a performance da UI nem o consumo de memória em dispositivos Android.",
     stack: ["Kotlin", "Jetpack Compose", "Android"],
     status: "Concluído",
-    link: "https://github.com"
+    link: "https://github.com/JustGuerreiro"
   },
   {
     id: 3,
-    title: "ESP32-CAM Audio System",
-    category: "Hardware & Embedded",
-    image: "https://images.unsplash.com/photo-1518770660439-4636190af475?auto=format&fit=crop&w=800&q=80",
-    description: "Sistema embebido integrando microcontrolador ESP32-CAM e módulo DFPlayer Mini para processamento e reprodução de áudio.",
-    problem: "Integrar captura/controlo num microcontrolador compacto com reprodução de áudio dedicada via cartão microSD.",
-    architecture: "Comunicação série UART entre o ESP32-CAM (programado em C++) e o descodificador hardware DFPlayer Mini numa breadboard dedicada.",
-    challenges: "Estabilização da alimentação elétrica na breadboard para evitar ruído no áudio e gestão de pinos partilhados do ESP32-CAM.",
-    stack: ["C++", "ESP32", "Hardware", "UART"],
-    status: "Concluído",
-    link: "https://github.com"
-  },
-  {
-    id: 4,
     title: "Falling Grid 3D",
     category: "Web Game 3D",
     image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
-    description: "Jogo 3D interativo no browser com física em tempo real, controlo de esfera e plataformas dinâmicas que colapsam.",
+    description: "Jogo 3D interativo no browser com física em tempo real, multiplicadores de pontuação e plataformas dinâmicas que colapsam.",
     problem: "Construir um jogo 3D fluido diretamente no navegador sem motores pesados externos, mantendo 60 FPS constantes.",
-    architecture: "Motor de jogo assente em Three.js (WebGL) com loop de física customizado, deteção de colisões por grelha e estados de queda das plataformas.",
-    challenges: "Sincronizar a deteção de contacto da bola com o temporizador de queda de cada bloco individual da grelha.",
+    architecture: "Motor assente em Three.js (WebGL) com loop de física customizado, deteção de colisões por grelha e persistência de high-scores.",
+    challenges: "Sincronizar a deteção de contacto nos blocos com o temporizador de queda individual de cada plataforma.",
     stack: ["Three.js", "JavaScript", "WebGL"],
     status: "Concluído",
-    link: "https://github.com"
+    link: "https://github.com/JustGuerreiro"
   }
 ];
 
 export const INITIAL_SETUP = [
   {
     category: "Workstation // Core",
-    icon: "cpu",
+    icon: "monitor",
     items: [
-      { name: "Processador", detail: "Intel Core i7-10700" },
-      { name: "Gráfica", detail: "NVIDIA GeForce RTX 2060 Super" },
-      { name: "Memória", detail: "16GB RAM DDR4" },
-      { name: "Browser", detail: "Opera GX" }
+      { name: "Desktop Rig", detail: "Intel Core i7-10700 // RTX 2060 Super // 16GB RAM" },
+      { name: "Laptop", detail: "Lenovo AMD Ryzen 7 7730U" },
+      { name: "Sistema & Browser", detail: "Windows 11 Pro // Opera GX" }
     ]
   },
   {
     category: "Dev // Stack & Tools",
     icon: "terminal",
     items: [
-      { name: "IDEs", detail: "VS Code, Android Studio, Visual Studio" },
-      { name: "Code", detail: "C, C++, Kotlin, JavaScript, SQL" },
-      { name: "Version Control", detail: "Git & GitHub" }
+      { name: "IDEs & Editores", detail: "VS Code, Eclipse IDE & Android Studio" },
+      { name: "Linguagens & Web", detail: "Java, Kotlin, Python, JavaScript, HTML/CSS, SQL" },
+      { name: "Cloud & Controlo", detail: "Git, GitHub, Vercel & Supabase" }
     ]
   },
   {
-    category: "Media // Visuals",
+    category: "Media // Visuals & 3D",
     icon: "camera",
     items: [
-      { name: "Câmara", detail: "Canon EOS M50 Mark II" },
-      { name: "Video & VFX", detail: "DaVinci Resolve & After Effects" },
-      { name: "Design", detail: "Adobe Photoshop" }
-    ]
-  },
-  {
-    category: "Daily // Gear",
-    icon: "smartphone",
-    items: [
-      { name: "Smartphone", detail: "Poco X7 Pro" },
-      { name: "Daily Ride", detail: "VW Polo 1.0 (2001)" }
+      { name: "Câmaras", detail: "Canon EOS M50 Mark II & Canon EOS 2000D" },
+      { name: "Vídeo & VFX", detail: "DaVinci Resolve, Adobe After Effects & CapCut" },
+      { name: "3D & Design", detail: "Blender & Adobe Photoshop" }
     ]
   }
 ];
@@ -168,41 +148,24 @@ export const INITIAL_COUPLE_DATA = {
         { id: 2, text: "Escolher zona do hotel", done: false },
         { id: 3, text: "Listar pontos principais por dia", done: false }
       ]
-    },
-    {
-      id: 103,
-      title: "Roadtrip Costa Vicentina",
-      meta: "Fim de semana",
-      notes: "Praias, falésias e pôr do sol",
-      mapsUrl: "",
-      done: true,
-      createdAt: 1710000000,
-      checklist: [
-        { id: 1, text: "Atestar depósito e playlist pronta", done: true },
-        { id: 2, text: "Paragem em Odeceixe e Arrifana", done: true }
-      ]
     }
   ],
   restaurantes: [
     { id: 201, title: "Ramen Tradicional & Gyozas", meta: "Japonês", notes: "Pedir caldo tonkotsu picante", mapsUrl: "https://maps.google.com/?q=Ramen+Restaurante", done: false, createdAt: 1710000005 },
-    { id: 202, title: "Steakhouse Maturada", meta: "Carnes", notes: "Jantar especial a dois", mapsUrl: "https://maps.google.com/?q=Steakhouse", done: false, createdAt: 1710000004 },
-    { id: 203, title: "Tapas & Petiscos", meta: "Ibérico", notes: "Ambiente brutal ao final da tarde", mapsUrl: "https://maps.google.com/?q=Tapas+Portimao", done: true, createdAt: 1710000003 }
+    { id: 202, title: "Steakhouse Maturada", meta: "Carnes", notes: "Jantar especial a dois", mapsUrl: "https://maps.google.com/?q=Steakhouse", done: false, createdAt: 1710000004 }
   ],
   filmes: [
     { id: 301, title: "Dune: Part Two", meta: "Sci-Fi", notes: "Sessão épica", mapsUrl: "", done: true, createdAt: 1710000006 },
     { id: 302, title: "Interstellar (Rewatch)", meta: "Sci-Fi", notes: "Ver num serão de chuva", mapsUrl: "", done: false, createdAt: 1710000008 },
-    { id: 303, title: "Severance", meta: "Série Thriller", notes: "Maratonar temporada", mapsUrl: "", done: false, createdAt: 1710000009 },
     { id: 304, title: "The Batman", meta: "Noir / Action", notes: "Sessão de sofá à noite", mapsUrl: "", done: false, createdAt: 1710000007 }
   ],
   jogos: [
     { id: 401, title: "It Takes Two", meta: "PC // Co-op", notes: "Obrigatório terminar a dois", mapsUrl: "", done: false, createdAt: 1710000012 },
     { id: 402, title: "Overcooked! All You Can Eat", meta: "Co-op Caótico", notes: "Tentar não incendiar a cozinha", mapsUrl: "", done: true, createdAt: 1710000010 },
-    { id: 403, title: "A Way Out", meta: "Split-screen", notes: "Fuga da prisão", mapsUrl: "", done: false, createdAt: 1710000011 },
-    { id: 404, title: "Portal 2 (Co-op)", meta: "Puzzles", notes: "Testar sinergia e raciocínio", mapsUrl: "", done: false, createdAt: 1710000013 }
+    { id: 403, title: "A Way Out", meta: "Split-screen", notes: "Fuga da prisão", mapsUrl: "", done: false, createdAt: 1710000011 }
   ]
 };
 
-// Biblioteca Cultural com Capa (cover) e Estado de Consumo (status: 'active' | 'completed')
 export const INITIAL_SHELF_DATA = {
   jogos: [
     {
@@ -217,7 +180,7 @@ export const INITIAL_SHELF_DATA = {
     {
       id: 502,
       title: "Pokémon Champions",
-      meta: "Competitivo // Estratégia",
+      meta: "Competitivo // 3v3",
       status: "active",
       rating: 5,
       cover: "https://images.unsplash.com/photo-1613771404721-1f92d799e49f?auto=format&fit=crop&w=600&q=80",
@@ -227,21 +190,12 @@ export const INITIAL_SHELF_DATA = {
   filmes: [
     {
       id: 601,
-      title: "Oppenheimer",
-      meta: "IMAX // 2023",
+      title: "The Dark Knight",
+      meta: "Christopher Nolan",
       status: "completed",
       rating: 5,
-      cover: "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?auto=format&fit=crop&w=600&q=80",
-      review: "Banda sonora e fotografia absurdas."
-    },
-    {
-      id: 602,
-      title: "Fight Club",
-      meta: "Clássico Cult",
-      status: "completed",
-      rating: 5,
-      cover: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=600&q=80",
-      review: "Guião e reviravolta intemporais."
+      cover: "https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?auto=format&fit=crop&w=600&q=80",
+      review: "Referência absoluta do cinema live-action."
     }
   ],
   series: [
@@ -253,35 +207,17 @@ export const INITIAL_SHELF_DATA = {
       rating: 5,
       cover: "https://images.unsplash.com/photo-1574375927938-d5a98e8ffe85?auto=format&fit=crop&w=600&q=80",
       review: "Obra-prima do início ao fim."
-    },
-    {
-      id: 702,
-      title: "Mr. Robot",
-      meta: "Cyber / Thriller",
-      status: "active",
-      rating: 5,
-      cover: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=600&q=80",
-      review: "A melhor representação de hacking e estética dark."
     }
   ],
   concertos: [
     {
       id: 801,
-      title: "Slipknot // Evil Live",
-      meta: "Lisboa",
-      status: "completed",
+      title: "Sleep Token // Live Ritual",
+      meta: "UK / Tour",
+      status: "active",
       rating: 5,
       cover: "https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=600&q=80",
-      review: "Energia brutal ao vivo, mosh do início ao fim."
-    },
-    {
-      id: 802,
-      title: "Metallica // WorldWired",
-      meta: "Estádio do Restelo",
-      status: "completed",
-      rating: 5,
-      cover: "https://images.unsplash.com/photo-1501386761578-eac5c94b800a?auto=format&fit=crop&w=600&q=80",
-      review: "Setlist lendária e produção gigante."
+      review: "Atmosfera e produção visual únicas."
     }
   ]
 };

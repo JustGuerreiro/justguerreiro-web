@@ -4,6 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <meta name="theme-color" content="#e11d48">
+  <meta name="description" content="JustGuerreiro // Diogo Guerreiro — Engenharia Informática, Desenvolvimento de Software & Produção Visual.">
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <title>JustGuerreiro // Diogo Guerreiro</title>
@@ -38,23 +39,23 @@
           <i data-lucide="layers"></i> <span>PROJETOS</span>
         </button>
         <button class="nav-trigger" data-view="setup">
-          <i data-lucide="cpu"></i> <span>SETUP</span>
+          <i data-lucide="monitor"></i> <span>SETUP</span>
         </button>
         <button class="nav-trigger" data-view="about">
-          <i data-lucide="user-check"></i> <span>SOBRE & CONTACTO</span>
+          <i data-lucide="user"></i> <span>ABOUT ME</span>
         </button>
         <button class="nav-trigger private-nav-item hidden" data-view="private">
-          <i data-lucide="shield-alert"></i> <span>ÁREA PRIVADA</span>
+          <i data-lucide="lock"></i> <span>ÁREA PRIVADA</span>
         </button>
       </nav>
 
       <div class="auth-zone">
         <!-- Botão Terminal Cyberpunk -->
         <button id="open-terminal-btn" class="btn-outline btn-sm" title="Abrir Terminal (Alt + T)">
-         <i data-lucide="terminal"></i>
+          <i data-lucide="terminal"></i>
         </button>
 
-        <!-- Botão Instalar PWA (aparece quando suportado) -->
+        <!-- Botão Instalar PWA -->
         <button id="install-pwa-btn" class="btn-outline btn-sm hidden" title="Instalar App">
           <i data-lucide="smartphone"></i> <span>APP</span>
         </button>
@@ -77,15 +78,15 @@
       <span>Projetos</span>
     </button>
     <button class="mob-nav-btn nav-trigger" data-view="setup">
-      <i data-lucide="cpu"></i>
+      <i data-lucide="monitor"></i>
       <span>Setup</span>
     </button>
     <button class="mob-nav-btn nav-trigger" data-view="about">
-      <i data-lucide="user-check"></i>
-      <span>Contacto</span>
+      <i data-lucide="user"></i>
+      <span>About Me</span>
     </button>
     <button class="mob-nav-btn nav-trigger private-nav-item hidden" data-view="private">
-      <i data-lucide="heart"></i>
+      <i data-lucide="lock"></i>
       <span>Privado</span>
     </button>
     <button class="mob-nav-btn" id="mob-auth-trigger">
@@ -104,13 +105,13 @@
         </div>
         <h1>DIOGO GUERREIRO <span class="text-stroke">// JUSTGUERREIRO</span></h1>
         <p class="hero-lead">
-          Engenharia Informática, sistemas embebidos, desenvolvimento nativo e produção visual. Código limpo com estética alternativa.
+          Engenharia Informática, arquitetura de software, aplicações nativas e produção visual. Código limpo com estética urbana e alternativa.
         </p>
         <div class="hero-cta">
           <a href="#work-anchor" class="btn-red">EXPLORAR PROJETOS</a>
-          <button class="btn-outline" data-goto-view="about">SOBRE & CONTACTO</button>
+          <button class="btn-outline" data-goto-view="about">ABOUT ME</button>
           <button class="btn-outline" id="hero-terminal-btn">
-            <i data-lucide="terminal"></i> ABRIR TERMINAL
+            <i data-lucide="terminal"></i> TERMINAL
           </button>
         </div>
       </div>
@@ -118,16 +119,16 @@
       <!-- Strip de Especialidades -->
       <div class="tech-strip">
         <div class="strip-item">
-          <span class="mono red-text">01 // DEV</span>
-          <strong>C, C++, Kotlin & JS</strong>
+          <span class="mono red-text">01 // SOFTWARE & APPS</span>
+          <strong>Java, Kotlin, Python & JS</strong>
         </div>
         <div class="strip-item">
-          <span class="mono red-text">02 // HARDWARE</span>
-          <strong>ESP32 & Sistemas</strong>
+          <span class="mono red-text">02 // ARQUITETURA & WEB</span>
+          <strong>Electron, FastAPI & Cloud</strong>
         </div>
         <div class="strip-item">
-          <span class="mono red-text">03 // VISUAL</span>
-          <strong>Vídeo, VFX & 3D Web</strong>
+          <span class="mono red-text">03 // VISUAL & MEDIA</span>
+          <strong>Vídeo, VFX, 3D & WebGL</strong>
         </div>
       </div>
 
@@ -150,19 +151,19 @@
     <section id="view-setup" class="view-panel">
       <div class="section-bar">
         <div>
-          <span class="mono red-text">// HARDWARE, GEAR & SOFTWARE</span>
+          <span class="mono red-text">// WORKSTATION & TOOLS</span>
           <h2>O MEU SETUP</h2>
         </div>
       </div>
       <div id="setup-grid" class="uses-grid"></div>
     </section>
 
-    <!-- ==================== VISTA 3: SOBRE & CONTACTO ==================== -->
+    <!-- ==================== VISTA 3: ABOUT ME ==================== -->
     <section id="view-about" class="view-panel">
       <div class="section-bar">
         <div>
           <span class="mono red-text">// IDENTITY & NETWORK</span>
-          <h2>SOBRE MIM & CONTACTO</h2>
+          <h2>ABOUT ME</h2>
         </div>
       </div>
 
@@ -182,12 +183,12 @@
 
           <div class="about-highlights">
             <div class="highlight-box">
-              <span class="mono red-text">FOCO TÉCNICO</span>
-              <p>Engenharia de Software, Arquitetura Desktop, Android (Kotlin/Compose) & Sistemas Embebidos (C++/ESP32).</p>
+              <span class="mono red-text">ENGENHARIA & CÓDIGO</span>
+              <p>Desenvolvimento de aplicações desktop (Electron/Python), mobile (Kotlin/Jetpack Compose), algoritmos em Java e plataformas web full-stack.</p>
             </div>
             <div class="highlight-box">
-              <span class="mono red-text">BACKGROUND CRIATIVO</span>
-              <p>Fotografia e vídeo com Canon M50 Mark II, edição em DaVinci Resolve, VFX em After Effects e música.</p>
+              <span class="mono red-text">PRODUÇÃO CRIATIVA</span>
+              <p>Captação e edição de vídeo em DaVinci Resolve e After Effects, modelação 3D em Blender e música.</p>
             </div>
           </div>
         </div>
@@ -195,7 +196,6 @@
         <!-- Coluna Links e Contacto Direto -->
         <div class="contact-cards-stack">
           
-          <!-- GitHub -->
           <a id="link-github" href="#" target="_blank" rel="noopener" class="cyber-card contact-link-card">
             <div class="contact-card-left">
               <i data-lucide="github" class="red-text"></i>
@@ -207,7 +207,6 @@
             <i data-lucide="arrow-up-right"></i>
           </a>
 
-          <!-- LinkedIn -->
           <a id="link-linkedin" href="#" target="_blank" rel="noopener" class="cyber-card contact-link-card">
             <div class="contact-card-left">
               <i data-lucide="linkedin" class="red-text"></i>
@@ -219,24 +218,22 @@
             <i data-lucide="arrow-up-right"></i>
           </a>
 
-          <!-- E-mail Profissional com Proteção Anti-Spam (Copy to Clipboard) -->
           <div class="cyber-card contact-link-card" id="copy-email-card" role="button" tabindex="0">
             <div class="contact-card-left">
               <i data-lucide="mail" class="red-text"></i>
               <div>
-                <span class="mono muted">// CONTACTO DIRETO (ANTI-SPAM)</span>
+                <span class="mono muted">// CONTACTO DIRETO</span>
                 <h4 id="display-email-text">Copiar E-mail Profissional</h4>
               </div>
             </div>
             <span class="btn-red btn-sm mono" id="copy-email-badge">COPIAR</span>
           </div>
 
-          <!-- Instagram / Visual Portfolio -->
           <a id="link-instagram" href="#" target="_blank" rel="noopener" class="cyber-card contact-link-card">
             <div class="contact-card-left">
               <i data-lucide="instagram" class="red-text"></i>
               <div>
-                <span class="mono muted">// VISUALS & LIFESTYLE</span>
+                <span class="mono muted">// VISUALS & MEDIA</span>
                 <h4>Instagram (@JustGuerreiro)</h4>
               </div>
             </div>
@@ -257,30 +254,27 @@
           <h2 id="private-welcome">BEM-VINDO</h2>
         </div>
         <div class="header-tools">
-          <button id="export-btn" class="btn-outline btn-sm">
-            <i data-lucide="download"></i> <span>JSON</span>
-          </button>
-          <button id="reset-btn" class="btn-outline btn-sm">
-            <i data-lucide="refresh-cw"></i> <span>RESET</span>
+          <button id="export-btn" class="btn-outline btn-sm" title="Exportar Backup JSON">
+            <i data-lucide="download"></i> <span>BACKUP JSON</span>
           </button>
         </div>
       </div>
 
       <!-- Sub-navegação da Área Privada -->
       <div class="subnav-tabs">
-        <button class="sub-tab active" data-subview="couple">
-          <i data-lucide="flame"></i> ESPAÇO DE CASAL
-        </button>
         <button class="sub-tab" data-subview="shelf">
           <i data-lucide="disc-3"></i> BIBLIOTECA CULTURAL
         </button>
+        <button class="sub-tab" data-subview="couple">
+          <i data-lucide="flame"></i> ESPAÇO DE CASAL
+        </button>
         <button class="sub-tab admin-only hidden" data-subview="cms">
-          <i data-lucide="plus-square"></i> PUBLICAR PROJETO
+          <i data-lucide="folder-cog"></i> GERIR PROJETOS
         </button>
       </div>
 
       <!-- SUB-VISTA 4.1: ESPAÇO DE CASAL -->
-      <div id="subview-couple" class="subview-panel active">
+      <div id="subview-couple" class="subview-panel">
 
         <!-- CONTADORES DE TEMPO JUNTOS + MURAL DE 2 FOTOS -->
         <div class="couple-hero-grid">
@@ -388,7 +382,7 @@
           </div>
         </div>
 
-        <!-- Grelha de Cartões da Categoria (Com Mini-Checklist nas Viagens) -->
+        <!-- Grelha de Cartões da Categoria -->
         <div id="couple-cards-grid" class="couple-cards-grid"></div>
 
       </div>
@@ -396,7 +390,7 @@
       <!-- SUB-VISTA 4.2: BIBLIOTECA CULTURAL -->
       <div id="subview-shelf" class="subview-panel">
         
-        <!-- MINI-ESTATÍSTICAS CULTURAIS (Apenas Concluídos/Vistos) -->
+        <!-- MINI-ESTATÍSTICAS CULTURAIS -->
         <div id="shelf-stats-bar" class="shelf-stats-grid"></div>
 
         <!-- Abas de Temas da Biblioteca Cultural -->
@@ -417,7 +411,7 @@
           </div>
         </div>
 
-        <!-- Formulário Dinâmico (Com Estado de Consumo e Poster/Capa) -->
+        <!-- Formulário Dinâmico -->
         <form id="add-shelf-form" class="cyber-card form-grid">
           <input type="text" id="s-title" placeholder="Nome do Jogo" required>
           <input type="text" id="s-meta" placeholder="Plataforma / Ano" required>
@@ -464,31 +458,47 @@
         <div id="shelf-grid" class="projects-grid"></div>
       </div>
 
-      <!-- SUB-VISTA 4.3: CMS ADMIN -->
+      <!-- SUB-VISTA 4.3: CMS ADMIN (CRIAR, EDITAR E APAGAR PROJETOS) -->
       <div id="subview-cms" class="subview-panel">
-        <div class="cyber-card" style="padding: 1.5rem;">
-          <span class="mono red-text">// ADMIN CMS</span>
-          <h3 style="margin: 0.4rem 0 1rem;">ADICIONAR PROJETO AO PORTEFÓLIO (COM CASE STUDY)</h3>
-          <form id="add-project-form" class="cms-stack">
+        <div class="cyber-card" style="padding: 1.5rem; margin-bottom: 2rem;">
+          <span class="mono red-text" id="cms-form-tag">// NOVO PROJETO</span>
+          <h3 id="cms-form-heading" style="margin: 0.4rem 0 1rem;">PUBLICAR PROJETO NO PORTEFÓLIO</h3>
+          
+          <form id="project-cms-form" class="cms-stack">
+            <input type="hidden" id="p-edit-id">
             <div class="cms-row">
               <input type="text" id="p-title" placeholder="Nome do Projeto" required>
-              <input type="text" id="p-cat" placeholder="Categoria (ex: Embedded, Web, Android)" required>
+              <input type="text" id="p-cat" placeholder="Categoria (ex: Desktop, Web 3D, Mobile App)" required>
             </div>
-            <input type="url" id="p-img" placeholder="URL da Imagem de Capa (https://...)" required>
+            <div class="cms-row">
+              <input type="url" id="p-img" placeholder="URL da Imagem de Capa (https://...)" required>
+              <input type="url" id="p-link" placeholder="URL do Repositório / Demo (https://github.com/...)" required>
+            </div>
             <textarea id="p-desc" rows="2" placeholder="Resumo curto para o cartão..." required></textarea>
             <textarea id="p-problem" rows="2" placeholder="Problema que resolve (Case Study)..."></textarea>
             <textarea id="p-arch" rows="2" placeholder="Arquitetura Técnica (Case Study)..."></textarea>
             <textarea id="p-challenges" rows="2" placeholder="Desafios superados (Case Study)..."></textarea>
             <div class="cms-row">
-              <input type="text" id="p-stack" placeholder="Stack separada por vírgulas (C++, ESP32, Kotlin)" required>
+              <input type="text" id="p-stack" placeholder="Stack separada por vírgulas (ex: Kotlin, Jetpack Compose, Git)" required>
               <select id="p-status" class="cyber-select">
                 <option value="Concluído">Concluído</option>
                 <option value="Em Desenvolvimento">Em Desenvolvimento</option>
               </select>
             </div>
-            <button type="submit" class="btn-red">PUBLICAR NO PORTEFÓLIO</button>
+            <div style="display:flex; gap: 0.75rem; flex-wrap: wrap;">
+              <button type="submit" class="btn-red" id="p-submit-btn">PUBLICAR NO PORTEFÓLIO</button>
+              <button type="button" class="btn-outline hidden" id="p-cancel-edit-btn">CANCELAR EDIÇÃO</button>
+            </div>
           </form>
         </div>
+
+        <div class="section-bar">
+          <div>
+            <span class="mono red-text">// PROJETOS ATUAIS</span>
+            <h3>GERIR, EDITAR OU REMOVER</h3>
+          </div>
+        </div>
+        <div id="cms-projects-list" class="couple-cards-grid"></div>
       </div>
 
     </section>
@@ -518,49 +528,37 @@
         <button class="modal-close" id="close-terminal" style="position:static; font-size:1.3rem;">&times;</button>
       </div>
       <div id="terminal-output" class="terminal-body mono">
-        <div>JUSTGUERREIRO OS v2.6 // SYS.READY</div>
-        <div class="muted">Escreve <span class="red-text">help</span> para veres a lista de comandos disponíveis.</div>
+        <div>JUSTGUERREIRO OS v1.0 // SYS.READY</div>
+        <div class="muted">Escreve <span class="red-text">help</span> para listar os comandos disponíveis.</div>
       </div>
       <form id="terminal-form" class="terminal-input-row mono">
         <span class="red-text">jg@sys:~$</span>
-        <input type="text" id="terminal-input" placeholder="help, whoami, skills, projects, contact, clear..." autocomplete="off">
+        <input type="text" id="terminal-input" placeholder="help, whoami, skills, projects, setup, contact, clear..." autocomplete="off">
       </form>
     </div>
   </div>
 
-  <!-- ==================== MODAL DE LOGIN ==================== -->
+  <!-- ==================== MODAL DE LOGIN (PRODUÇÃO) ==================== -->
   <div id="login-modal" class="modal-overlay hidden">
     <div class="cyber-modal">
       <button class="modal-close" id="close-login">&times;</button>
       <div class="modal-head">
         <div class="brand-badge">JG</div>
-        <h3>AUTENTICAÇÃO PRIVADA</h3>
-        <p class="mono muted">Introduz o teu username para desbloquear.</p>
+        <h3>ÁREA RESERVADA</h3>
+        <p class="mono muted">Autenticação necessária para aceder ao painel privado.</p>
       </div>
 
       <form id="login-form">
-        <label class="mono">USERNAME</label>
-        <input type="text" id="login-user" placeholder="JustGuerreiro ou Amor" autocomplete="username" required>
+        <label class="mono">UTILIZADOR</label>
+        <input type="text" id="login-user" placeholder="Username" autocomplete="username" required>
 
-        <label class="mono">PASSWORD</label>
-        <input type="password" id="login-pass" placeholder="•••" autocomplete="current-password" required>
+        <label class="mono">PALAVRA-PASSE</label>
+        <input type="password" id="login-pass" placeholder="••••••••" autocomplete="current-password" required>
 
-        <p id="login-err" class="err-text mono hidden">>> ERRO: CREDENCIAIS INVÁLIDAS</p>
+        <p id="login-err" class="err-text mono hidden">>> CREDENCIAIS INVÁLIDAS</p>
 
-        <button type="submit" class="btn-red full-w" style="margin-top: 1.2rem;">ENTRAR NO SISTEMA</button>
+        <button type="submit" class="btn-red full-w" style="margin-top: 1.4rem;">INICIAR SESSÃO</button>
       </form>
-
-      <div class="quick-access">
-        <span class="mono muted">// ACESSO RÁPIDO (TESTE):</span>
-        <div class="quick-grid">
-          <button type="button" class="btn-outline btn-sm" data-quick-user="JustGuerreiro">
-            ⚡ JustGuerreiro
-          </button>
-          <button type="button" class="btn-outline btn-sm" data-quick-user="Amor">
-            ❤️ Amor
-          </button>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -576,14 +574,14 @@
       <form id="photo-form">
         <input type="hidden" id="photo-slot-id">
 
-        <label class="mono">1. ESCOLHER FOTO DO TELEMÓVEL / PC</label>
+        <label class="mono">1. ESCOLHER FOTO DO DISPOSITIVO</label>
         <input type="file" id="photo-file-input" accept="image/*" class="file-input">
 
         <label class="mono">OU 2. COLAR LINK DIRETO DE IMAGEM</label>
         <input type="url" id="photo-url-input" placeholder="https://...">
 
         <label class="mono">LEGENDA DA FOTO</label>
-        <input type="text" id="photo-caption-input" placeholder="Ex: Viagem ao Norte // 2026" required>
+        <input type="text" id="photo-caption-input" placeholder="Legenda da memória" required>
 
         <button type="submit" class="btn-red full-w" style="margin-top: 1.2rem;">GUARDAR FOTOGRAFIA</button>
       </form>

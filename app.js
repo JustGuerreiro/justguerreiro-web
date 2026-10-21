@@ -1,7 +1,7 @@
 import {
   SUPABASE_URL,
   SUPABASE_ANON_KEY,
-  TEST_USERS,
+  USERS,
   PROFILE_CONTACT,
   INITIAL_PROJECTS,
   INITIAL_SETUP,
@@ -41,7 +41,7 @@ const DATE_DATING = new Date(2026, 3, 1, 0, 0, 0);
 // ==================== INICIALIZAÇÃO ====================
 document.addEventListener('DOMContentLoaded', async () => {
   renderSetup();
-  renderAboutContact();
+  renderAboutMe();
   updateAuthUI();
   startRelationshipTimers();
   setupNavigation();
@@ -52,10 +52,9 @@ document.addEventListener('DOMContentLoaded', async () => {
   setupShelfEvents();
   setupCMSEvents();
   setupAuthEvents();
-  setupBackupReset();
+  setupBackupExport();
   registerPWA();
 
-  // Carregar dados da nuvem e ativar WebSockets
   await loadAllDataFromSupabase();
   setupRealtimeSubscriptions();
 
@@ -83,7 +82,6 @@ async function loadAllDataFromSupabase() {
     if (projData && projData.length > 0) {
       projects = projData;
     } else {
-      // Se a tabela estiver vazia, popula com os projetos iniciais
       await supabase.from('projects').insert(INITIAL_PROJECTS.map(p => ({
         title: p.title,
         category: p.category,
@@ -100,6 +98,7 @@ async function loadAllDataFromSupabase() {
       projects = refetched || [];
     }
     renderProjects();
+    renderCMSProjectsList();
 
     // 2. Fotos do Casal
     const { data: photos } = await supabase.from('couple_photos').select('*').order('id', { ascending: true });
@@ -126,7 +125,6 @@ async function loadAllDataFromSupabase() {
         }
       });
     } else {
-      // Se a tabela estiver vazia, popula com os dados iniciais
       const seedItems = [];
       Object.keys(INITIAL_COUPLE_DATA).forEach(cat => {
         INITIAL_COUPLE_DATA[cat].forEach(item => {
@@ -210,7 +208,7 @@ async function loadAllDataFromSupabase() {
     renderShelf();
 
   } catch (err) {
-    console.error("Erro a carregar dados do Supabase:", err);
+    console.error("Erro ao sincronizar com o Supabase:", err);
   }
 }
 
@@ -266,6 +264,7 @@ function setupRealtimeSubscriptions() {
       if (data) {
         projects = data;
         renderProjects();
+        renderCMSProjectsList();
       }
     })
     .subscribe();
@@ -336,6 +335,13 @@ function renderSingleTimer(startDate, now, digitsId, subId) {
 }
 
 // ==================== NAVEGAÇÃO ====================
+function activatePrivateSubview(subviewName) {
+  const subTabs = document.querySelectorAll('.sub-tab');
+  const subPanels = document.querySelectorAll('.subview-panel');
+  subTabs.forEach(t => t.classList.toggle('active', t.dataset.subview === subviewName));
+  subPanels.forEach(p => p.classList.toggle('active', p.id === `subview-${subviewName}`));
+}
+
 function setupNavigation() {
   const triggers = document.querySelectorAll('.nav-trigger');
   const panels = document.querySelectorAll('.view-panel');
@@ -360,13 +366,9 @@ function setupNavigation() {
   });
 
   const subTabs = document.querySelectorAll('.sub-tab');
-  const subPanels = document.querySelectorAll('.subview-panel');
   subTabs.forEach(tab => {
     tab.addEventListener('click', () => {
-      subTabs.forEach(t => t.classList.remove('active'));
-      subPanels.forEach(p => p.classList.remove('active'));
-      tab.classList.add('active');
-      document.getElementById(`subview-${tab.dataset.subview}`).classList.add('active');
+      activatePrivateSubview(tab.dataset.subview);
     });
   });
 
@@ -387,8 +389,10 @@ function renderProjects() {
     ? projects
     : projects.filter(p => p.status === activeProjectFilter);
 
+  const isAdmin = currentUser?.role === 'admin';
+
   grid.innerHTML = list.map(p => `
-    <article class="project-card">
+    <article class="project-card" data-proj-id="${p.id}">
       <div class="project-cover">
         <img src="${p.image}" alt="${p.title}" loading="lazy">
         <span class="cover-badge mono">${p.status}</span>
@@ -405,11 +409,21 @@ function renderProjects() {
           </div>
           <div class="project-actions-row">
             <button type="button" class="repo-link mono open-case-btn" data-proj-id="${p.id}">
-              <i data-lucide="cpu"></i> CASE STUDY TÉCNICO
+              <i data-lucide="file-code"></i> CASE STUDY
             </button>
-            <a href="${p.link}" target="_blank" class="repo-link mono">
-              GITHUB <i data-lucide="arrow-up-right"></i>
-            </a>
+            <div style="display:flex; align-items:center; gap: 0.65rem;">
+              ${isAdmin ? `
+                <button type="button" class="del-btn edit-proj-quick" data-proj-id="${p.id}" title="Editar Projeto">
+                  <i data-lucide="pencil" style="width:15px; height:15px;"></i>
+                </button>
+                <button type="button" class="del-btn del-proj-quick" data-proj-id="${p.id}" title="Apagar Projeto">
+                  <i data-lucide="trash-2" style="width:15px; height:15px;"></i>
+                </button>
+              ` : ''}
+              <a href="${p.link}" target="_blank" class="repo-link mono">
+                GITHUB <i data-lucide="arrow-up-right"></i>
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -418,6 +432,22 @@ function renderProjects() {
 
   grid.querySelectorAll('.open-case-btn').forEach(btn => {
     btn.addEventListener('click', () => openCaseStudy(Number(btn.dataset.projId)));
+  });
+
+  grid.querySelectorAll('.edit-proj-quick').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const id = Number(btn.dataset.projId);
+      document.querySelector('[data-view="private"]').click();
+      activatePrivateSubview('cms');
+      populateCMSFormForEdit(id);
+    });
+  });
+
+  grid.querySelectorAll('.del-proj-quick').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      const id = Number(btn.dataset.projId);
+      await deleteProjectById(id);
+    });
   });
 
   refreshIcons();
@@ -469,7 +499,7 @@ function openCaseStudy(id) {
   refreshIcons();
 }
 
-// ==================== SETUP & SOBRE/CONTACTO ====================
+// ==================== SETUP & ABOUT ME ====================
 function renderSetup() {
   const grid = document.getElementById('setup-grid');
   grid.innerHTML = INITIAL_SETUP.map(group => `
@@ -488,7 +518,7 @@ function renderSetup() {
   refreshIcons();
 }
 
-function renderAboutContact() {
+function renderAboutMe() {
   document.getElementById('about-location').textContent = `📍 ${PROFILE_CONTACT.location} // ${PROFILE_CONTACT.role}`;
   document.getElementById('about-bio-text').textContent = PROFILE_CONTACT.bio;
   document.getElementById('link-github').href = PROFILE_CONTACT.github;
@@ -555,23 +585,23 @@ function setupCyberTerminal() {
         printLine(`Comandos disponíveis:
           <br>• <span class="red-text">whoami</span> : Perfil de Diogo Guerreiro
           <br>• <span class="red-text">skills</span> : Stack tecnológica
-          <br>• <span class="red-text">projects</span> : Listar projetos na base de dados
-          <br>• <span class="red-text">setup</span> : Hardware principal
-          <br>• <span class="red-text">contact</span> : Copiar e-mail
-          <br>• <span class="red-text">login</span> : Acesso reservado
+          <br>• <span class="red-text">projects</span> : Listar projetos ativos
+          <br>• <span class="red-text">setup</span> : Workstation & Software
+          <br>• <span class="red-text">contact</span> : Copiar e-mail profissional
+          <br>• <span class="red-text">login</span> : Abrir janela de autenticação
           <br>• <span class="red-text">clear</span> : Limpar ecrã`);
         break;
       case 'whoami':
         printLine(`${PROFILE_CONTACT.name} (@${PROFILE_CONTACT.handle}) — ${PROFILE_CONTACT.role}. Baseado em ${PROFILE_CONTACT.location}.`);
         break;
       case 'skills':
-        printLine(`>> CODE: C, C++, Kotlin, JS, SQL, Git<br>>> HARDWARE: ESP32-CAM, IoT<br>>> CREATIVE: DaVinci Resolve, After Effects, Photoshop`);
+        printLine(`>> DEV: Java, Kotlin (Jetpack Compose), Python (FastAPI), Electron, JS, SQL, Git<br>>> VISUAL: DaVinci Resolve, After Effects, Blender, Three.js`);
         break;
       case 'projects':
         printLine(projects.map(p => `• <strong>${p.title}</strong> [${p.status}] — ${(p.stack || []).join(', ')}`).join('<br>'));
         break;
       case 'setup':
-        printLine(`Desktop i7-10700 | RTX 2060 Super | 16GB RAM | Canon EOS M50 Mark II | Poco X7 Pro`);
+        printLine(`Desktop i7-10700 | RTX 2060 Super | 16GB RAM | Lenovo Ryzen 7 | Canon EOS M50 Mark II`);
         break;
       case 'contact':
         navigator.clipboard.writeText(PROFILE_CONTACT.email);
@@ -636,7 +666,7 @@ function setupPhotoModalEvents() {
     const updateInSupabase = async (finalUrl) => {
       await supabase.from('couple_photos').upsert({ id: slotId, url: finalUrl, caption });
       modal.classList.add('hidden');
-      toast('Fotografia atualizada na nuvem!');
+      toast('Fotografia atualizada!');
     };
 
     if (fileInput.files && fileInput.files[0]) {
@@ -855,7 +885,7 @@ function renderCoupleSection() {
     btn.addEventListener('click', async (e) => {
       const id = Number(e.target.closest('.c-card').dataset.id);
       await supabase.from('couple_items').delete().eq('id', id);
-      toast('Item removido da nuvem.');
+      toast('Item removido.');
     });
   });
 
@@ -1081,22 +1111,29 @@ function renderShelf() {
     btn.addEventListener('click', async (e) => {
       const id = Number(e.target.closest('.project-card').dataset.id);
       await supabase.from('shelf_items').delete().eq('id', id);
-      toast('Registo removido da nuvem.');
+      toast('Registo removido.');
     });
   });
 
   refreshIcons();
 }
 
-// ==================== CMS ADMIN (SUPABASE) ====================
+// ==================== CMS ADMIN: CRIAR, EDITAR E APAGAR PROJETOS ====================
 function setupCMSEvents() {
-  document.getElementById('add-project-form').addEventListener('submit', async (e) => {
+  const form = document.getElementById('project-cms-form');
+  const cancelBtn = document.getElementById('p-cancel-edit-btn');
+
+  cancelBtn.addEventListener('click', () => resetCMSForm());
+
+  form.addEventListener('submit', async (e) => {
     e.preventDefault();
     if (currentUser?.role !== 'admin') return;
 
+    const editId = document.getElementById('p-edit-id').value;
     const title = document.getElementById('p-title').value.trim();
     const category = document.getElementById('p-cat').value.trim();
     const image = document.getElementById('p-img').value.trim();
+    const link = document.getElementById('p-link').value.trim() || "https://github.com/JustGuerreiro";
     const description = document.getElementById('p-desc').value.trim();
     const problem = document.getElementById('p-problem').value.trim();
     const architecture = document.getElementById('p-arch').value.trim();
@@ -1104,25 +1141,109 @@ function setupCMSEvents() {
     const stack = document.getElementById('p-stack').value.split(',').map(s => s.trim()).filter(Boolean);
     const status = document.getElementById('p-status').value;
 
-    await supabase.from('projects').insert([{
+    const payload = {
       title,
       category,
       image,
+      link,
       description,
       problem: problem || description,
       architecture: architecture || "Arquitetura modular.",
-      challenges: challenges || "Implementação e testes práticos.",
+      challenges: challenges || "Implementação e otimização.",
       stack,
-      status,
-      link: "https://github.com"
-    }]);
+      status
+    };
 
-    e.target.reset();
-    toast('Projeto publicado com sucesso na base de dados!');
+    if (editId) {
+      await supabase.from('projects').update(payload).eq('id', Number(editId));
+      toast('Projeto atualizado com sucesso!');
+    } else {
+      await supabase.from('projects').insert([payload]);
+      toast('Novo projeto publicado no portefólio!');
+    }
+
+    resetCMSForm();
   });
 }
 
-// ==================== LOGIN ====================
+function populateCMSFormForEdit(id) {
+  const p = projects.find(item => item.id === id);
+  if (!p) return;
+
+  document.getElementById('p-edit-id').value = p.id;
+  document.getElementById('p-title').value = p.title;
+  document.getElementById('p-cat').value = p.category;
+  document.getElementById('p-img').value = p.image;
+  document.getElementById('p-link').value = p.link || "https://github.com/JustGuerreiro";
+  document.getElementById('p-desc').value = p.description;
+  document.getElementById('p-problem').value = p.problem || "";
+  document.getElementById('p-arch').value = p.architecture || "";
+  document.getElementById('p-challenges').value = p.challenges || "";
+  document.getElementById('p-stack').value = (p.stack || []).join(', ');
+  document.getElementById('p-status').value = p.status;
+
+  document.getElementById('cms-form-tag').textContent = `// EDITAR PROJETO #${p.id}`;
+  document.getElementById('cms-form-heading').textContent = `A EDITAR: ${p.title.toUpperCase()}`;
+  document.getElementById('p-submit-btn').textContent = 'GUARDAR ALTERAÇÕES';
+  document.getElementById('p-cancel-edit-btn').classList.remove('hidden');
+
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function resetCMSForm() {
+  const form = document.getElementById('project-cms-form');
+  form.reset();
+  document.getElementById('p-edit-id').value = '';
+  document.getElementById('cms-form-tag').textContent = '// NOVO PROJETO';
+  document.getElementById('cms-form-heading').textContent = 'PUBLICAR PROJETO NO PORTEFÓLIO';
+  document.getElementById('p-submit-btn').textContent = 'PUBLICAR NO PORTEFÓLIO';
+  document.getElementById('p-cancel-edit-btn').classList.add('hidden');
+}
+
+async function deleteProjectById(id) {
+  if (currentUser?.role !== 'admin') return;
+  await supabase.from('projects').delete().eq('id', id);
+  toast('Projeto apagado do portefólio.');
+}
+
+function renderCMSProjectsList() {
+  const container = document.getElementById('cms-projects-list');
+  if (!container) return;
+
+  container.innerHTML = projects.map(p => `
+    <div class="c-card" data-id="${p.id}">
+      <div>
+        <div class="c-card-top">
+          <h4>${p.title}</h4>
+          <span class="c-meta-tag mono">${p.status}</span>
+        </div>
+        <p class="muted" style="font-size:0.84rem; margin-top:0.35rem;">${p.description}</p>
+      </div>
+      <div class="c-card-bottom">
+        <button type="button" class="btn-outline btn-sm cms-edit-btn" data-id="${p.id}">
+          <i data-lucide="pencil"></i> EDITAR
+        </button>
+        <button type="button" class="del-btn cms-del-btn" data-id="${p.id}" title="Apagar Projeto">
+          <i data-lucide="trash-2" style="width:16px; height:16px;"></i>
+        </button>
+      </div>
+    </div>
+  `).join('');
+
+  container.querySelectorAll('.cms-edit-btn').forEach(btn => {
+    btn.addEventListener('click', () => populateCMSFormForEdit(Number(btn.dataset.id)));
+  });
+
+  container.querySelectorAll('.cms-del-btn').forEach(btn => {
+    btn.addEventListener('click', async () => {
+      await deleteProjectById(Number(btn.dataset.id));
+    });
+  });
+
+  refreshIcons();
+}
+
+// ==================== LOGIN & DEFAULT SUBVIEW POR CONTA ====================
 function setupAuthEvents() {
   const authBtn = document.getElementById('auth-btn');
   const mobAuthBtn = document.getElementById('mob-auth-trigger');
@@ -1136,10 +1257,12 @@ function setupAuthEvents() {
       currentUser = null;
       localStorage.removeItem('jg_user');
       updateAuthUI();
+      renderProjects();
       document.querySelector('[data-view="portfolio"]').click();
       toast('Sessão terminada.');
     } else {
       modal.classList.remove('hidden');
+      document.getElementById('login-user').focus();
     }
   };
 
@@ -1153,34 +1276,28 @@ function setupAuthEvents() {
     }
   });
 
-  document.querySelectorAll('[data-quick-user]').forEach(btn => {
-    btn.addEventListener('click', () => {
-      document.getElementById('login-user').value = btn.dataset.quickUser;
-      document.getElementById('login-pass').value = '123';
-      form.requestSubmit();
-    });
-  });
-
   form.addEventListener('submit', (e) => {
     e.preventDefault();
     const rawUser = document.getElementById('login-user').value.trim().toLowerCase();
     const pass = document.getElementById('login-pass').value;
 
-    const account = TEST_USERS[rawUser];
+    const account = USERS[rawUser];
     if (account && account.password === pass) {
       currentUser = {
         username: account.username,
         displayName: account.displayName,
         role: account.role,
-        avatar: account.avatar
+        avatar: account.avatar,
+        defaultSubview: account.defaultSubview
       };
       localStorage.setItem('jg_user', JSON.stringify(currentUser));
       modal.classList.add('hidden');
       errEl.classList.add('hidden');
       form.reset();
       updateAuthUI();
+      renderProjects();
       document.querySelector('[data-view="private"]').click();
-      toast(`Bem-vindo, ${currentUser.username}!`);
+      toast(`Bem-vindo(a), ${currentUser.username}!`);
     } else {
       errEl.classList.remove('hidden');
     }
@@ -1208,6 +1325,10 @@ function updateAuthUI() {
       : '// ACESSO CASAL ❤️';
 
     adminTab.classList.toggle('hidden', currentUser.role !== 'admin');
+
+    // Define a sub-vista padrão consoante a conta (JustGuerreiro -> shelf | Amor -> couple)
+    const targetSub = currentUser.defaultSubview || (currentUser.role === 'admin' ? 'shelf' : 'couple');
+    activatePrivateSubview(targetSub);
   } else {
     authBtn.innerHTML = `<i data-lucide="key-round"></i> <span>LOGIN</span>`;
     mobLabel.textContent = 'Login';
@@ -1219,20 +1340,16 @@ function updateAuthUI() {
   refreshIcons();
 }
 
-// ==================== BACKUP & RESET ====================
-function setupBackupReset() {
+// ==================== BACKUP ====================
+function setupBackupExport() {
   document.getElementById('export-btn').addEventListener('click', () => {
     const data = { projects, coupleData, couplePhotos, shelfData };
     const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'justguerreiro-supabase-backup.json';
+    a.download = 'justguerreiro-backup.json';
     a.click();
-    toast('Backup exportado da nuvem!');
-  });
-
-  document.getElementById('reset-btn').addEventListener('click', async () => {
-    toast('Para repor os dados, executa a query inicial no Supabase.');
+    toast('Backup JSON exportado!');
   });
 }
