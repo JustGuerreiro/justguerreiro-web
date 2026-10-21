@@ -1,3 +1,7 @@
+// Configuração do Supabase
+export const SUPABASE_URL = "https://ykqwudzfhtuhxnkpygxj.supabase.co";
+export const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InlrcXd1ZHpmaHR1aHhua3B5Z3hqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3OTI1MjA4NjksImV4cCI6MjEwODA5Njg2OX0.iypdLyh5cJe8_mK-pHhz6zHUHZLWcYu6-lUO1lpBNDk";
+
 export const TEST_USERS = {
   "justguerreiro": {
     username: "JustGuerreiro",

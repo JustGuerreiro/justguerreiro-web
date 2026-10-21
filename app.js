@@ -1,19 +1,24 @@
 import {
+  SUPABASE_URL,
+  SUPABASE_ANON_KEY,
   TEST_USERS,
   PROFILE_CONTACT,
-  INITIAL_COUPLE_PHOTOS,
   INITIAL_PROJECTS,
   INITIAL_SETUP,
   INITIAL_COUPLE_DATA,
   INITIAL_SHELF_DATA
 } from './data.js';
 
-// ==================== ESTADO ====================
+// Inicializar Cliente Supabase
+const { createClient } = window.supabase;
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+// Estado da Aplicação
 let currentUser = JSON.parse(localStorage.getItem('jg_user')) || null;
-let projects = JSON.parse(localStorage.getItem('jg_projects_v3')) || INITIAL_PROJECTS;
-let coupleData = JSON.parse(localStorage.getItem('jg_couple_v3')) || INITIAL_COUPLE_DATA;
-let couplePhotos = JSON.parse(localStorage.getItem('jg_couple_photos')) || INITIAL_COUPLE_PHOTOS;
-let shelfData = JSON.parse(localStorage.getItem('jg_shelf_v3')) || INITIAL_SHELF_DATA;
+let projects = [];
+let coupleData = { viagens: [], restaurantes: [], filmes: [], jogos: [] };
+let couplePhotos = [];
+let shelfData = { jogos: [], filmes: [], series: [], concertos: [] };
 
 let activeProjectFilter = 'all';
 
@@ -34,15 +39,10 @@ const DATE_TOGETHER = new Date(2026, 0, 1, 0, 0, 0);
 const DATE_DATING = new Date(2026, 3, 1, 0, 0, 0);
 
 // ==================== INICIALIZAÇÃO ====================
-document.addEventListener('DOMContentLoaded', () => {
-  renderProjects();
+document.addEventListener('DOMContentLoaded', async () => {
   renderSetup();
   renderAboutContact();
-  renderCouplePhotos();
-  renderCoupleSection();
-  renderShelf();
   updateAuthUI();
-
   startRelationshipTimers();
   setupNavigation();
   setupCaseStudyModal();
@@ -54,6 +54,10 @@ document.addEventListener('DOMContentLoaded', () => {
   setupAuthEvents();
   setupBackupReset();
   registerPWA();
+
+  // Carregar dados da nuvem e ativar WebSockets
+  await loadAllDataFromSupabase();
+  setupRealtimeSubscriptions();
 
   refreshIcons();
 });
@@ -71,7 +75,203 @@ function toast(msg) {
   setTimeout(() => el.remove(), 2800);
 }
 
-// ==================== PWA (PROGRESSIVE WEB APP) ====================
+// ==================== CARREGAMENTO DE DADOS SUPABASE ====================
+async function loadAllDataFromSupabase() {
+  try {
+    // 1. Projetos
+    const { data: projData } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
+    if (projData && projData.length > 0) {
+      projects = projData;
+    } else {
+      // Se a tabela estiver vazia, popula com os projetos iniciais
+      await supabase.from('projects').insert(INITIAL_PROJECTS.map(p => ({
+        title: p.title,
+        category: p.category,
+        image: p.image,
+        description: p.description,
+        problem: p.problem,
+        architecture: p.architecture,
+        challenges: p.challenges,
+        stack: p.stack,
+        status: p.status,
+        link: p.link
+      })));
+      const { data: refetched } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
+      projects = refetched || [];
+    }
+    renderProjects();
+
+    // 2. Fotos do Casal
+    const { data: photos } = await supabase.from('couple_photos').select('*').order('id', { ascending: true });
+    if (photos && photos.length > 0) {
+      couplePhotos = photos;
+      renderCouplePhotos();
+    }
+
+    // 3. Espaço de Casal
+    const { data: cItems } = await supabase.from('couple_items').select('*').order('created_at', { ascending: false });
+    if (cItems && cItems.length > 0) {
+      coupleData = { viagens: [], restaurantes: [], filmes: [], jogos: [] };
+      cItems.forEach(i => {
+        if (coupleData[i.category]) {
+          coupleData[i.category].push({
+            id: i.id,
+            title: i.title,
+            meta: i.meta,
+            notes: i.notes,
+            mapsUrl: i.maps_url,
+            done: i.done,
+            checklist: i.checklist || []
+          });
+        }
+      });
+    } else {
+      // Se a tabela estiver vazia, popula com os dados iniciais
+      const seedItems = [];
+      Object.keys(INITIAL_COUPLE_DATA).forEach(cat => {
+        INITIAL_COUPLE_DATA[cat].forEach(item => {
+          seedItems.push({
+            category: cat,
+            title: item.title,
+            meta: item.meta,
+            notes: item.notes,
+            maps_url: item.mapsUrl || '',
+            done: item.done,
+            checklist: item.checklist || []
+          });
+        });
+      });
+      await supabase.from('couple_items').insert(seedItems);
+      const { data: refetchedItems } = await supabase.from('couple_items').select('*').order('created_at', { ascending: false });
+      refetchedItems?.forEach(i => {
+        if (coupleData[i.category]) {
+          coupleData[i.category].push({
+            id: i.id,
+            title: i.title,
+            meta: i.meta,
+            notes: i.notes,
+            mapsUrl: i.maps_url,
+            done: i.done,
+            checklist: i.checklist || []
+          });
+        }
+      });
+    }
+    renderCoupleSection();
+
+    // 4. Biblioteca Cultural
+    const { data: sItems } = await supabase.from('shelf_items').select('*').order('created_at', { ascending: false });
+    if (sItems && sItems.length > 0) {
+      shelfData = { jogos: [], filmes: [], series: [], concertos: [] };
+      sItems.forEach(i => {
+        if (shelfData[i.category]) {
+          shelfData[i.category].push({
+            id: i.id,
+            title: i.title,
+            meta: i.meta,
+            status: i.status,
+            rating: i.rating,
+            cover: i.cover,
+            review: i.review
+          });
+        }
+      });
+    } else {
+      const seedShelf = [];
+      Object.keys(INITIAL_SHELF_DATA).forEach(cat => {
+        INITIAL_SHELF_DATA[cat].forEach(item => {
+          seedShelf.push({
+            category: cat,
+            title: item.title,
+            meta: item.meta,
+            status: item.status,
+            rating: item.rating,
+            cover: item.cover,
+            review: item.review
+          });
+        });
+      });
+      await supabase.from('shelf_items').insert(seedShelf);
+      const { data: refetchedShelf } = await supabase.from('shelf_items').select('*').order('created_at', { ascending: false });
+      refetchedShelf?.forEach(i => {
+        if (shelfData[i.category]) {
+          shelfData[i.category].push({
+            id: i.id,
+            title: i.title,
+            meta: i.meta,
+            status: i.status,
+            rating: i.rating,
+            cover: i.cover,
+            review: i.review
+          });
+        }
+      });
+    }
+    renderShelf();
+
+  } catch (err) {
+    console.error("Erro a carregar dados do Supabase:", err);
+  }
+}
+
+// ==================== SINCRONIZAÇÃO EM TEMPO REAL (REALTIME) ====================
+function setupRealtimeSubscriptions() {
+  supabase
+    .channel('schema-db-changes')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'couple_items' }, async () => {
+      const { data } = await supabase.from('couple_items').select('*').order('created_at', { ascending: false });
+      coupleData = { viagens: [], restaurantes: [], filmes: [], jogos: [] };
+      data?.forEach(i => {
+        if (coupleData[i.category]) {
+          coupleData[i.category].push({
+            id: i.id,
+            title: i.title,
+            meta: i.meta,
+            notes: i.notes,
+            mapsUrl: i.maps_url,
+            done: i.done,
+            checklist: i.checklist || []
+          });
+        }
+      });
+      renderCoupleSection();
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'couple_photos' }, async () => {
+      const { data } = await supabase.from('couple_photos').select('*').order('id', { ascending: true });
+      if (data) {
+        couplePhotos = data;
+        renderCouplePhotos();
+      }
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'shelf_items' }, async () => {
+      const { data } = await supabase.from('shelf_items').select('*').order('created_at', { ascending: false });
+      shelfData = { jogos: [], filmes: [], series: [], concertos: [] };
+      data?.forEach(i => {
+        if (shelfData[i.category]) {
+          shelfData[i.category].push({
+            id: i.id,
+            title: i.title,
+            meta: i.meta,
+            status: i.status,
+            rating: i.rating,
+            cover: i.cover,
+            review: i.review
+          });
+        }
+      });
+      renderShelf();
+    })
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'projects' }, async () => {
+      const { data } = await supabase.from('projects').select('*').order('created_at', { ascending: false });
+      if (data) {
+        projects = data;
+        renderProjects();
+      }
+    })
+    .subscribe();
+}
+
+// ==================== PWA ====================
 function registerPWA() {
   if ('serviceWorker' in navigator) {
     navigator.serviceWorker.register('./sw.js').catch(() => {});
@@ -86,7 +286,7 @@ function registerPWA() {
     installBtn.classList.remove('hidden');
   });
 
-  installBtn.addEventListener('click', async () => {
+  installBtn?.addEventListener('click', async () => {
     if (!deferredPrompt) return;
     deferredPrompt.prompt();
     await deferredPrompt.userChoice;
@@ -95,7 +295,7 @@ function registerPWA() {
   });
 }
 
-// ==================== CONTADORES DE TEMPO JUNTOS ====================
+// ==================== CONTADORES DE TEMPO ====================
 function startRelationshipTimers() {
   const update = () => {
     const now = new Date();
@@ -159,7 +359,6 @@ function setupNavigation() {
     btn.addEventListener('click', () => switchView(btn.dataset.gotoView));
   });
 
-  // Sub-abas Privadas
   const subTabs = document.querySelectorAll('.sub-tab');
   const subPanels = document.querySelectorAll('.subview-panel');
   subTabs.forEach(tab => {
@@ -171,7 +370,6 @@ function setupNavigation() {
     });
   });
 
-  // Filtros de Projetos
   document.querySelectorAll('#project-filters .filter-chip').forEach(chip => {
     chip.addEventListener('click', () => {
       document.querySelectorAll('#project-filters .filter-chip').forEach(c => c.classList.remove('active'));
@@ -182,7 +380,7 @@ function setupNavigation() {
   });
 }
 
-// ==================== PORTEFÓLIO & MODAL CASE STUDY ====================
+// ==================== PORTEFÓLIO & CASE STUDY ====================
 function renderProjects() {
   const grid = document.getElementById('projects-grid');
   const list = activeProjectFilter === 'all'
@@ -203,7 +401,7 @@ function renderProjects() {
         </div>
         <div>
           <div class="stack-tags">
-            ${p.stack.map(s => `<span class="stack-tag mono">${s}</span>`).join('')}
+            ${(p.stack || []).map(s => `<span class="stack-tag mono">${s}</span>`).join('')}
           </div>
           <div class="project-actions-row">
             <button type="button" class="repo-link mono open-case-btn" data-proj-id="${p.id}">
@@ -250,20 +448,20 @@ function openCaseStudy(id) {
 
     <div class="case-block">
       <h4 class="mono">02 // ARQUITETURA & IMPLEMENTAÇÃO</h4>
-      <p>${p.architecture || "Arquitetura modular desenhada à medida dos requisitos do projeto."}</p>
+      <p>${p.architecture || "Arquitetura modular desenhada à medida dos requisitos."}</p>
     </div>
 
     <div class="case-block">
       <h4 class="mono">03 // DESAFIOS TÉCNICOS SUPERADOS</h4>
-      <p>${p.challenges || "Otimização de recursos, testes e fiabilidade em execução."}</p>
+      <p>${p.challenges || "Otimização de recursos e fiabilidade em execução."}</p>
     </div>
 
     <div class="stack-tags" style="margin-top:1rem;">
-      ${p.stack.map(s => `<span class="stack-tag mono">${s}</span>`).join('')}
+      ${(p.stack || []).map(s => `<span class="stack-tag mono">${s}</span>`).join('')}
     </div>
 
     <a href="${p.link}" target="_blank" class="btn-red full-w" style="margin-top:0.5rem;">
-      VER REPOSITÓRIO / DEMO NO GITHUB <i data-lucide="external-link"></i>
+      VER NO GITHUB <i data-lucide="external-link"></i>
     </a>
   `;
 
@@ -309,7 +507,7 @@ function renderAboutContact() {
   });
 }
 
-// ==================== MINI TERMINAL CYBERPUNK INTERATIVO ====================
+// ==================== TERMINAL CYBERPUNK ====================
 function setupCyberTerminal() {
   const modal = document.getElementById('terminal-modal');
   const openBtn = document.getElementById('open-terminal-btn');
@@ -356,28 +554,28 @@ function setupCyberTerminal() {
       case 'help':
         printLine(`Comandos disponíveis:
           <br>• <span class="red-text">whoami</span> : Perfil de Diogo Guerreiro
-          <br>• <span class="red-text">skills</span> : Stack tecnológica e ferramentas
-          <br>• <span class="red-text">projects</span> : Listar projetos do portefólio
-          <br>• <span class="red-text">setup</span> : Resumo do hardware principal
-          <br>• <span class="red-text">contact</span> : Mostrar redes e copiar email
-          <br>• <span class="red-text">login</span> : Abrir janela de autenticação privada
-          <br>• <span class="red-text">clear</span> : Limpar consola`);
+          <br>• <span class="red-text">skills</span> : Stack tecnológica
+          <br>• <span class="red-text">projects</span> : Listar projetos na base de dados
+          <br>• <span class="red-text">setup</span> : Hardware principal
+          <br>• <span class="red-text">contact</span> : Copiar e-mail
+          <br>• <span class="red-text">login</span> : Acesso reservado
+          <br>• <span class="red-text">clear</span> : Limpar ecrã`);
         break;
       case 'whoami':
         printLine(`${PROFILE_CONTACT.name} (@${PROFILE_CONTACT.handle}) — ${PROFILE_CONTACT.role}. Baseado em ${PROFILE_CONTACT.location}.`);
         break;
       case 'skills':
-        printLine(`>> CODE: C, C++, Kotlin (Jetpack Compose), JavaScript, SQL, Git<br>>> HARDWARE: ESP32-CAM, Microcontroladores, IoT<br>>> CREATIVE: DaVinci Resolve, After Effects, Photoshop, Three.js`);
+        printLine(`>> CODE: C, C++, Kotlin, JS, SQL, Git<br>>> HARDWARE: ESP32-CAM, IoT<br>>> CREATIVE: DaVinci Resolve, After Effects, Photoshop`);
         break;
       case 'projects':
-        printLine(projects.map(p => `• <strong>${p.title}</strong> [${p.status}] — ${p.stack.join(', ')}`).join('<br>'));
+        printLine(projects.map(p => `• <strong>${p.title}</strong> [${p.status}] — ${(p.stack || []).join(', ')}`).join('<br>'));
         break;
       case 'setup':
         printLine(`Desktop i7-10700 | RTX 2060 Super | 16GB RAM | Canon EOS M50 Mark II | Poco X7 Pro`);
         break;
       case 'contact':
         navigator.clipboard.writeText(PROFILE_CONTACT.email);
-        printLine(`GitHub: ${PROFILE_CONTACT.github}<br>E-mail (${PROFILE_CONTACT.email}) copiado automaticamente para o teu clipboard!`);
+        printLine(`E-mail (${PROFILE_CONTACT.email}) copiado para o clipboard!`);
         break;
       case 'login':
         modal.classList.add('hidden');
@@ -392,7 +590,7 @@ function setupCyberTerminal() {
   });
 }
 
-// ==================== MURAL DE 2 FOTOS PERSONALIZÁVEIS ====================
+// ==================== MURAL DE FOTOS (SUPABASE) ====================
 function renderCouplePhotos() {
   const container = document.getElementById('couple-photos-grid');
   container.innerHTML = couplePhotos.map(photo => `
@@ -428,35 +626,33 @@ function setupPhotoModalEvents() {
   const modal = document.getElementById('photo-modal');
   document.getElementById('close-photo-modal').addEventListener('click', () => modal.classList.add('hidden'));
 
-  document.getElementById('photo-form').addEventListener('submit', (e) => {
+  document.getElementById('photo-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const slotId = Number(document.getElementById('photo-slot-id').value);
     const fileInput = document.getElementById('photo-file-input');
     const urlInput = document.getElementById('photo-url-input').value.trim();
     const caption = document.getElementById('photo-caption-input').value.trim();
 
-    const savePhoto = (finalUrl) => {
-      couplePhotos = couplePhotos.map(p => p.id === slotId ? { ...p, url: finalUrl, caption } : p);
-      localStorage.setItem('jg_couple_photos', JSON.stringify(couplePhotos));
-      renderCouplePhotos();
+    const updateInSupabase = async (finalUrl) => {
+      await supabase.from('couple_photos').upsert({ id: slotId, url: finalUrl, caption });
       modal.classList.add('hidden');
-      toast('Fotografia atualizada!');
+      toast('Fotografia atualizada na nuvem!');
     };
 
     if (fileInput.files && fileInput.files[0]) {
       const reader = new FileReader();
-      reader.onload = (ev) => savePhoto(ev.target.result);
+      reader.onload = async (ev) => await updateInSupabase(ev.target.result);
       reader.readAsDataURL(fileInput.files[0]);
     } else if (urlInput) {
-      savePhoto(urlInput);
+      await updateInSupabase(urlInput);
     } else {
       const existing = couplePhotos.find(p => p.id === slotId);
-      savePhoto(existing.url);
+      await updateInSupabase(existing.url);
     }
   });
 }
 
-// ==================== SECÇÃO DE CASAL (COM MINI-CHECKLIST NAS VIAGENS) ====================
+// ==================== ESPAÇO DE CASAL (SUPABASE) ====================
 const FORM_PLACEHOLDERS = {
   viagens: { title: "Destino (ex: Escócia, Londres...)", meta: "Data prevista (ex: Março 2027)" },
   restaurantes: { title: "Nome do Restaurante", meta: "Tipo de cozinha / Zona" },
@@ -495,7 +691,7 @@ function setupCoupleEvents() {
     renderCoupleSection();
   });
 
-  document.getElementById('add-couple-form').addEventListener('submit', (e) => {
+  document.getElementById('add-couple-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const title = document.getElementById('c-title').value.trim();
     const meta = document.getElementById('c-meta').value.trim();
@@ -504,19 +700,16 @@ function setupCoupleEvents() {
 
     if (!title) return;
 
-    coupleData[activeCat].unshift({
-      id: Date.now(),
+    await supabase.from('couple_items').insert([{
+      category: activeCat,
       title,
       meta,
       notes: notes || "Sem notas adicionais",
-      mapsUrl: activeCat === 'restaurantes' ? mapsUrl : "",
+      maps_url: activeCat === 'restaurantes' ? mapsUrl : "",
       done: false,
-      createdAt: Date.now(),
       checklist: activeCat === 'viagens' ? [] : undefined
-    });
+    }]);
 
-    saveCoupleData();
-    renderCoupleSection();
     e.target.reset();
     toast(`Adicionado a ${activeCat.toUpperCase()}!`);
   });
@@ -581,9 +774,9 @@ function renderCoupleSection() {
   filtered.sort((a, b) => {
     if (coupleSortBy === 'pending-first') {
       if (a.done !== b.done) return a.done ? 1 : -1;
-      return (b.createdAt || 0) - (a.createdAt || 0);
+      return b.id - a.id;
     }
-    if (coupleSortBy === 'newest') return (b.createdAt || 0) - (a.createdAt || 0);
+    if (coupleSortBy === 'newest') return b.id - a.id;
     if (coupleSortBy === 'az') return a.title.localeCompare(b.title, 'pt');
     return 0;
   });
@@ -651,71 +844,55 @@ function renderCoupleSection() {
     `;
   }).join('');
 
-  // Eventos Marcar Viagem/Plano principal como feito
   grid.querySelectorAll('.toggle-c-done').forEach(chk => {
-    chk.addEventListener('change', (e) => {
+    chk.addEventListener('change', async (e) => {
       const id = Number(e.target.closest('.c-card').dataset.id);
-      coupleData[activeCat] = coupleData[activeCat].map(i => i.id === id ? { ...i, done: e.target.checked } : i);
-      saveCoupleData();
-      renderCoupleSection();
+      await supabase.from('couple_items').update({ done: e.target.checked }).eq('id', id);
     });
   });
 
-  // Eventos Apagar cartão principal
   grid.querySelectorAll('.del-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
       const id = Number(e.target.closest('.c-card').dataset.id);
-      coupleData[activeCat] = coupleData[activeCat].filter(i => i.id !== id);
-      saveCoupleData();
-      renderCoupleSection();
-      toast('Item removido.');
+      await supabase.from('couple_items').delete().eq('id', id);
+      toast('Item removido da nuvem.');
     });
   });
 
-  // Eventos da Mini-Checklist de Viagens
   if (activeCat === 'viagens') {
     grid.querySelectorAll('.toggle-subcheck').forEach(subChk => {
-      subChk.addEventListener('change', (e) => {
+      subChk.addEventListener('change', async (e) => {
         const cardId = Number(e.target.closest('.c-card').dataset.id);
         const subId = Number(e.target.closest('.subcheck-item').dataset.subId);
-        coupleData.viagens = coupleData.viagens.map(trip => {
-          if (trip.id !== cardId) return trip;
-          const updatedList = (trip.checklist || []).map(s => s.id === subId ? { ...s, done: e.target.checked } : s);
-          return { ...trip, checklist: updatedList };
-        });
-        saveCoupleData();
-        renderCoupleSection();
+        const trip = coupleData.viagens.find(t => t.id === cardId);
+        if (!trip) return;
+        const updated = (trip.checklist || []).map(s => s.id === subId ? { ...s, done: e.target.checked } : s);
+        await supabase.from('couple_items').update({ checklist: updated }).eq('id', cardId);
       });
     });
 
     grid.querySelectorAll('.subcheck-del').forEach(delBtn => {
-      delBtn.addEventListener('click', (e) => {
+      delBtn.addEventListener('click', async (e) => {
         const cardId = Number(e.target.closest('.c-card').dataset.id);
         const subId = Number(e.target.closest('.subcheck-item').dataset.subId);
-        coupleData.viagens = coupleData.viagens.map(trip => {
-          if (trip.id !== cardId) return trip;
-          return { ...trip, checklist: (trip.checklist || []).filter(s => s.id !== subId) };
-        });
-        saveCoupleData();
-        renderCoupleSection();
+        const trip = coupleData.viagens.find(t => t.id === cardId);
+        if (!trip) return;
+        const updated = (trip.checklist || []).filter(s => s.id !== subId);
+        await supabase.from('couple_items').update({ checklist: updated }).eq('id', cardId);
       });
     });
 
     grid.querySelectorAll('.subcheck-add-form').forEach(subForm => {
-      subForm.addEventListener('submit', (e) => {
+      subForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const cardId = Number(e.target.closest('.c-card').dataset.id);
         const input = subForm.querySelector('input');
         const text = input.value.trim();
         if (!text) return;
-
-        coupleData.viagens = coupleData.viagens.map(trip => {
-          if (trip.id !== cardId) return trip;
-          const list = trip.checklist || [];
-          return { ...trip, checklist: [...list, { id: Date.now(), text, done: false }] };
-        });
-        saveCoupleData();
-        renderCoupleSection();
+        const trip = coupleData.viagens.find(t => t.id === cardId);
+        if (!trip) return;
+        const updated = [...(trip.checklist || []), { id: Date.now(), text, done: false }];
+        await supabase.from('couple_items').update({ checklist: updated }).eq('id', cardId);
       });
     });
   }
@@ -723,36 +900,12 @@ function renderCoupleSection() {
   refreshIcons();
 }
 
-function saveCoupleData() {
-  localStorage.setItem('jg_couple_v3', JSON.stringify(coupleData));
-}
-
-// ==================== BIBLIOTECA CULTURAL (CAPAS, ESTADO & MINI-ESTATÍSTICAS) ====================
+// ==================== BIBLIOTECA CULTURAL (SUPABASE) ====================
 const SHELF_CONFIG = {
-  jogos: {
-    title: "Nome do Jogo (ex: Counter-Strike 2)",
-    meta: "Plataforma / Género",
-    activeLabel: "🔥 A Jogar Agora",
-    doneLabel: "✅ Jogo Terminado"
-  },
-  filmes: {
-    title: "Título do Filme",
-    meta: "Ano / Realizador",
-    activeLabel: "🎬 A Ver Agora",
-    doneLabel: "✅ Filme Assistido"
-  },
-  series: {
-    title: "Nome da Série",
-    meta: "Temporadas / Plataforma",
-    activeLabel: "📺 A Acompanhar Agora",
-    doneLabel: "✅ Série Assistida"
-  },
-  concertos: {
-    title: "Banda / Artista & Festival",
-    meta: "Local / Ano",
-    activeLabel: "🎫 Bilhete Comprado / Próximo",
-    doneLabel: "✅ Concerto Assistido"
-  }
+  jogos: { title: "Nome do Jogo (ex: Counter-Strike 2)", meta: "Plataforma / Género", activeLabel: "🔥 A Jogar Agora", doneLabel: "✅ Jogo Terminado" },
+  filmes: { title: "Título do Filme", meta: "Ano / Realizador", activeLabel: "🎬 A Ver Agora", doneLabel: "✅ Filme Assistido" },
+  series: { title: "Nome da Série", meta: "Temporadas / Plataforma", activeLabel: "📺 A Acompanhar Agora", doneLabel: "✅ Série Assistida" },
+  concertos: { title: "Banda / Artista & Festival", meta: "Local / Ano", activeLabel: "🎫 Bilhete Comprado / Próximo", doneLabel: "✅ Concerto Assistido" }
 };
 
 function setupShelfEvents() {
@@ -785,7 +938,7 @@ function setupShelfEvents() {
     renderShelf();
   });
 
-  document.getElementById('add-shelf-form').addEventListener('submit', (e) => {
+  document.getElementById('add-shelf-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const title = document.getElementById('s-title').value.trim();
     const meta = document.getElementById('s-meta').value.trim();
@@ -796,18 +949,16 @@ function setupShelfEvents() {
 
     if (!title) return;
 
-    shelfData[activeShelfCat].unshift({
-      id: Date.now(),
+    await supabase.from('shelf_items').insert([{
+      category: activeShelfCat,
       title,
       meta,
       status,
       rating,
       cover: cover || "https://images.unsplash.com/photo-1518709268805-4e9042af9f23?auto=format&fit=crop&w=600&q=80",
       review
-    });
+    }]);
 
-    saveShelfData();
-    renderShelf();
     e.target.reset();
     syncShelfFormPlaceholders();
     toast(`Adicionado a ${activeShelfCat.toUpperCase()}!`);
@@ -825,7 +976,6 @@ function syncShelfFormPlaceholders() {
 }
 
 function renderShelfStats() {
-  // Conta apenas os itens concluídos/vistos
   const doneJogos = (shelfData.jogos || []).filter(i => i.status === 'completed').length;
   const doneFilmes = (shelfData.filmes || []).filter(i => i.status === 'completed').length;
   const doneSeries = (shelfData.series || []).filter(i => i.status === 'completed').length;
@@ -916,39 +1066,31 @@ function renderShelf() {
     </article>
   `).join('');
 
-  // Alternar estado (Currently Playing/Watching <-> Concluído)
   grid.querySelectorAll('.toggle-shelf-status').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
       const id = Number(e.target.closest('.project-card').dataset.id);
-      shelfData[activeShelfCat] = shelfData[activeShelfCat].map(i =>
-        i.id === id ? { ...i, status: i.status === 'active' ? 'completed' : 'active' } : i
-      );
-      saveShelfData();
-      renderShelf();
-      toast('Estado de consumo atualizado!');
+      const cur = rawList.find(i => i.id === id);
+      if (!cur) return;
+      const nextStatus = cur.status === 'active' ? 'completed' : 'active';
+      await supabase.from('shelf_items').update({ status: nextStatus }).eq('id', id);
+      toast('Estado atualizado!');
     });
   });
 
   grid.querySelectorAll('.del-shelf-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
+    btn.addEventListener('click', async (e) => {
       const id = Number(e.target.closest('.project-card').dataset.id);
-      shelfData[activeShelfCat] = shelfData[activeShelfCat].filter(i => i.id !== id);
-      saveShelfData();
-      renderShelf();
-      toast('Registo removido da biblioteca.');
+      await supabase.from('shelf_items').delete().eq('id', id);
+      toast('Registo removido da nuvem.');
     });
   });
 
   refreshIcons();
 }
 
-function saveShelfData() {
-  localStorage.setItem('jg_shelf_v3', JSON.stringify(shelfData));
-}
-
-// ==================== CMS ADMIN ====================
+// ==================== CMS ADMIN (SUPABASE) ====================
 function setupCMSEvents() {
-  document.getElementById('add-project-form').addEventListener('submit', (e) => {
+  document.getElementById('add-project-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     if (currentUser?.role !== 'admin') return;
 
@@ -962,8 +1104,7 @@ function setupCMSEvents() {
     const stack = document.getElementById('p-stack').value.split(',').map(s => s.trim()).filter(Boolean);
     const status = document.getElementById('p-status').value;
 
-    projects.unshift({
-      id: Date.now(),
+    await supabase.from('projects').insert([{
       title,
       category,
       image,
@@ -974,16 +1115,14 @@ function setupCMSEvents() {
       stack,
       status,
       link: "https://github.com"
-    });
+    }]);
 
-    localStorage.setItem('jg_projects_v3', JSON.stringify(projects));
-    renderProjects();
     e.target.reset();
-    toast('Projeto publicado com Case Study!');
+    toast('Projeto publicado com sucesso na base de dados!');
   });
 }
 
-// ==================== LOGIN POR USERNAME ====================
+// ==================== LOGIN ====================
 function setupAuthEvents() {
   const authBtn = document.getElementById('auth-btn');
   const mobAuthBtn = document.getElementById('mob-auth-trigger');
@@ -1088,24 +1227,12 @@ function setupBackupReset() {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'justguerreiro-backup.json';
+    a.download = 'justguerreiro-supabase-backup.json';
     a.click();
-    toast('Backup exportado!');
+    toast('Backup exportado da nuvem!');
   });
 
-  document.getElementById('reset-btn').addEventListener('click', () => {
-    localStorage.removeItem('jg_projects_v3');
-    localStorage.removeItem('jg_couple_v3');
-    localStorage.removeItem('jg_couple_photos');
-    localStorage.removeItem('jg_shelf_v3');
-    projects = INITIAL_PROJECTS;
-    coupleData = INITIAL_COUPLE_DATA;
-    couplePhotos = INITIAL_COUPLE_PHOTOS;
-    shelfData = INITIAL_SHELF_DATA;
-    renderProjects();
-    renderCouplePhotos();
-    renderCoupleSection();
-    renderShelf();
-    toast('Dados originais repostos.');
+  document.getElementById('reset-btn').addEventListener('click', async () => {
+    toast('Para repor os dados, executa a query inicial no Supabase.');
   });
 }
