@@ -5,16 +5,16 @@ export const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiO
 export const USERS = {
   "justguerreiro": {
     username: "JustGuerreiro",
-    password: "123", // Podes alterar a tua password aqui
+    password: "diogoxd2002", // Podes alterar a tua password aqui
     displayName: "Diogo Guerreiro",
     role: "admin",
     avatar: "JG",
     defaultSubview: "shelf" // Abre Biblioteca Cultural por defeito
   },
-  "amor": {
-    username: "Amor",
-    password: "123", // Podes alterar a password dela aqui
-    displayName: "Amor",
+  "nicole": {
+    username: "Nicole",
+    password: "0104", // Podes alterar a password dela aqui
+    displayName: "Nicole",
     role: "partner",
     avatar: "❤️",
     defaultSubview: "couple" // Abre Espaço de Casal por defeito
