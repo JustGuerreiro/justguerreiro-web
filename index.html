@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <meta name="theme-color" content="#e11d48">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>JustGuerreiro // Diogo Guerreiro</title>
+  <link rel="manifest" href="manifest.json">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+  <!-- Fundo Grelha Tech Urbana -->
+  <div class="cyber-grid"></div>
+  <div class="red-glow"></div>
+
+  <!-- Barra de Topo -->
+  <header class="topbar">
+    <div class="topbar-inner">
+      <div class="brand" id="brand-home">
+        <div class="brand-badge">JG</div>
+        <div class="brand-names">
+          <span class="brand-handle">JUST<span>GUERREIRO</span></span>
+          <span class="brand-real mono">// DIOGO GUERREIRO</span>
+        </div>
+      </div>
+
+      <!-- Navegação Desktop -->
+      <nav class="desktop-nav">
+        <button class="nav-trigger active" data-view="portfolio">
+          <i data-lucide="layers"></i> <span>PROJETOS</span>
+        </button>
+        <button class="nav-trigger" data-view="setup">
+          <i data-lucide="cpu"></i> <span>SETUP</span>
+        </button>
+        <button class="nav-trigger" data-view="about">
+          <i data-lucide="user-check"></i> <span>SOBRE & CONTACTO</span>
+        </button>
+        <button class="nav-trigger private-nav-item hidden" data-view="private">
+          <i data-lucide="shield-alert"></i> <span>ÁREA PRIVADA</span>
+        </button>
+      </nav>
+
+      <div class="auth-zone">
+        <!-- Botão Terminal Cyberpunk -->
+        <button id="open-terminal-btn" class="btn-outline btn-sm" title="Abrir Terminal (Alt + T)">
+          <i data-lucide="terminal"></i> <span class="mono">>_</span>
+        </button>
+
+        <!-- Botão Instalar PWA (aparece quando suportado) -->
+        <button id="install-pwa-btn" class="btn-outline btn-sm hidden" title="Instalar App">
+          <i data-lucide="smartphone"></i> <span>APP</span>
+        </button>
+
+        <div id="user-chip" class="user-chip hidden">
+          <span id="chip-avatar" class="chip-avatar"></span>
+          <span id="chip-name" class="mono"></span>
+        </div>
+        <button id="auth-btn" class="btn-red">
+          <i data-lucide="key-round"></i> <span>LOGIN</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <!-- Navegação Mobile Fixa em Baixo -->
+  <nav class="mobile-bottom-nav">
+    <button class="mob-nav-btn nav-trigger active" data-view="portfolio">
+      <i data-lucide="layers"></i>
+      <span>Projetos</span>
+    </button>
+    <button class="mob-nav-btn nav-trigger" data-view="setup">
+      <i data-lucide="cpu"></i>
+      <span>Setup</span>
+    </button>
+    <button class="mob-nav-btn nav-trigger" data-view="about">
+      <i data-lucide="user-check"></i>
+      <span>Contacto</span>
+    </button>
+    <button class="mob-nav-btn nav-trigger private-nav-item hidden" data-view="private">
+      <i data-lucide="heart"></i>
+      <span>Privado</span>
+    </button>
+    <button class="mob-nav-btn" id="mob-auth-trigger">
+      <i data-lucide="key-round"></i>
+      <span id="mob-auth-label">Login</span>
+    </button>
+  </nav>
+
+  <main class="container">
+
+    <!-- ==================== VISTA 1: PORTEFÓLIO ==================== -->
+    <section id="view-portfolio" class="view-panel active">
+      <div class="hero-box">
+        <div class="tag-cyber mono">
+          <span class="blink-dot"></span> SYS.ONLINE // PORTIMÃO, PT
+        </div>
+        <h1>DIOGO GUERREIRO <span class="text-stroke">// JUSTGUERREIRO</span></h1>
+        <p class="hero-lead">
+          Engenharia Informática, sistemas embebidos, desenvolvimento nativo e produção visual. Código limpo com estética alternativa.
+        </p>
+        <div class="hero-cta">
+          <a href="#work-anchor" class="btn-red">EXPLORAR PROJETOS</a>
+          <button class="btn-outline" data-goto-view="about">SOBRE & CONTACTO</button>
+          <button class="btn-outline" id="hero-terminal-btn">
+            <i data-lucide="terminal"></i> ABRIR TERMINAL
+          </button>
+        </div>
+      </div>
+
+      <!-- Strip de Especialidades -->
+      <div class="tech-strip">
+        <div class="strip-item">
+          <span class="mono red-text">01 // DEV</span>
+          <strong>C, C++, Kotlin & JS</strong>
+        </div>
+        <div class="strip-item">
+          <span class="mono red-text">02 // HARDWARE</span>
+          <strong>ESP32 & Sistemas</strong>
+        </div>
+        <div class="strip-item">
+          <span class="mono red-text">03 // VISUAL</span>
+          <strong>Vídeo, VFX & 3D Web</strong>
+        </div>
+      </div>
+
+      <div id="work-anchor" class="section-bar">
+        <div>
+          <span class="mono red-text">// WORK ARCHIVE</span>
+          <h2>PROJETOS EM DESTAQUE</h2>
+        </div>
+        <div class="filter-group" id="project-filters">
+          <button class="filter-chip active" data-filter="all">TODOS</button>
+          <button class="filter-chip" data-filter="Concluído">CONCLUÍDOS</button>
+          <button class="filter-chip" data-filter="Em Desenvolvimento">WORK IN PROGRESS</button>
+        </div>
+      </div>
+
+      <div id="projects-grid" class="projects-grid"></div>
+    </section>
+
+    <!-- ==================== VISTA 2: SETUP ==================== -->
+    <section id="view-setup" class="view-panel">
+      <div class="section-bar">
+        <div>
+          <span class="mono red-text">// HARDWARE, GEAR & SOFTWARE</span>
+          <h2>O MEU SETUP</h2>
+        </div>
+      </div>
+      <div id="setup-grid" class="uses-grid"></div>
+    </section>
+
+    <!-- ==================== VISTA 3: SOBRE & CONTACTO ==================== -->
+    <section id="view-about" class="view-panel">
+      <div class="section-bar">
+        <div>
+          <span class="mono red-text">// IDENTITY & NETWORK</span>
+          <h2>SOBRE MIM & CONTACTO</h2>
+        </div>
+      </div>
+
+      <div class="about-grid">
+        <!-- Coluna Bio -->
+        <div class="cyber-card about-bio-card">
+          <div class="about-id-header">
+            <div class="brand-badge lg">JG</div>
+            <div>
+              <span class="mono red-text">// PERFIL TÉCNICO & CRIATIVO</span>
+              <h3>Diogo Guerreiro <span class="muted mono">(JustGuerreiro)</span></h3>
+              <p class="mono muted" id="about-location"></p>
+            </div>
+          </div>
+
+          <p id="about-bio-text" class="about-text"></p>
+
+          <div class="about-highlights">
+            <div class="highlight-box">
+              <span class="mono red-text">FOCO TÉCNICO</span>
+              <p>Engenharia de Software, Arquitetura Desktop, Android (Kotlin/Compose) & Sistemas Embebidos (C++/ESP32).</p>
+            </div>
+            <div class="highlight-box">
+              <span class="mono red-text">BACKGROUND CRIATIVO</span>
+              <p>Fotografia e vídeo com Canon M50 Mark II, edição em DaVinci Resolve, VFX em After Effects e música.</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Coluna Links e Contacto Direto -->
+        <div class="contact-cards-stack">
+          
+          <!-- GitHub -->
+          <a id="link-github" href="#" target="_blank" rel="noopener" class="cyber-card contact-link-card">
+            <div class="contact-card-left">
+              <i data-lucide="github" class="red-text"></i>
+              <div>
+                <span class="mono muted">// REPOSITÓRIOS & CÓDIGO</span>
+                <h4>GitHub (@JustGuerreiro)</h4>
+              </div>
+            </div>
+            <i data-lucide="arrow-up-right"></i>
+          </a>
+
+          <!-- LinkedIn -->
+          <a id="link-linkedin" href="#" target="_blank" rel="noopener" class="cyber-card contact-link-card">
+            <div class="contact-card-left">
+              <i data-lucide="linkedin" class="red-text"></i>
+              <div>
+                <span class="mono muted">// REDE PROFISSIONAL</span>
+                <h4>LinkedIn (Diogo Guerreiro)</h4>
+              </div>
+            </div>
+            <i data-lucide="arrow-up-right"></i>
+          </a>
+
+          <!-- E-mail Profissional com Proteção Anti-Spam (Copy to Clipboard) -->
+          <div class="cyber-card contact-link-card" id="copy-email-card" role="button" tabindex="0">
+            <div class="contact-card-left">
+              <i data-lucide="mail" class="red-text"></i>
+              <div>
+                <span class="mono muted">// CONTACTO DIRETO (ANTI-SPAM)</span>
+                <h4 id="display-email-text">Copiar E-mail Profissional</h4>
+              </div>
+            </div>
+            <span class="btn-red btn-sm mono" id="copy-email-badge">COPIAR</span>
+          </div>
+
+          <!-- Instagram / Visual Portfolio -->
+          <a id="link-instagram" href="#" target="_blank" rel="noopener" class="cyber-card contact-link-card">
+            <div class="contact-card-left">
+              <i data-lucide="instagram" class="red-text"></i>
+              <div>
+                <span class="mono muted">// VISUALS & LIFESTYLE</span>
+                <h4>Instagram (@JustGuerreiro)</h4>
+              </div>
+            </div>
+            <i data-lucide="arrow-up-right"></i>
+          </a>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ==================== VISTA 4: ÁREA PRIVADA ==================== -->
+    <section id="view-private" class="view-panel">
+
+      <!-- Cabeçalho de Sessão -->
+      <div class="private-header-card">
+        <div>
+          <span id="role-tag" class="mono tag-cyber">ACESSO AUTORIZADO</span>
+          <h2 id="private-welcome">BEM-VINDO</h2>
+        </div>
+        <div class="header-tools">
+          <button id="export-btn" class="btn-outline btn-sm">
+            <i data-lucide="download"></i> <span>JSON</span>
+          </button>
+          <button id="reset-btn" class="btn-outline btn-sm">
+            <i data-lucide="refresh-cw"></i> <span>RESET</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sub-navegação da Área Privada -->
+      <div class="subnav-tabs">
+        <button class="sub-tab active" data-subview="couple">
+          <i data-lucide="flame"></i> ESPAÇO DE CASAL
+        </button>
+        <button class="sub-tab" data-subview="shelf">
+          <i data-lucide="disc-3"></i> BIBLIOTECA CULTURAL
+        </button>
+        <button class="sub-tab admin-only hidden" data-subview="cms">
+          <i data-lucide="plus-square"></i> PUBLICAR PROJETO
+        </button>
+      </div>
+
+      <!-- SUB-VISTA 4.1: ESPAÇO DE CASAL -->
+      <div id="subview-couple" class="subview-panel active">
+
+        <!-- CONTADORES DE TEMPO JUNTOS + MURAL DE 2 FOTOS -->
+        <div class="couple-hero-grid">
+          
+          <div class="timers-panel">
+            <div class="timer-block">
+              <div class="timer-head">
+                <span class="mono red-text">// JUNTOS DESDE 01.01.2026</span>
+                <i data-lucide="sparkles" class="red-text"></i>
+              </div>
+              <div id="timer-together" class="timer-digits mono">A calcular...</div>
+              <div id="timer-together-days" class="timer-sub mono"></div>
+            </div>
+
+            <div class="timer-divider"></div>
+
+            <div class="timer-block">
+              <div class="timer-head">
+                <span class="mono red-text">// A NAMORAR DESDE 01.04.2026</span>
+                <i data-lucide="heart" class="red-text"></i>
+              </div>
+              <div id="timer-dating" class="timer-digits mono">A calcular...</div>
+              <div id="timer-dating-days" class="timer-sub mono"></div>
+            </div>
+          </div>
+
+          <!-- Mural de 2 Fotos Personalizáveis -->
+          <div id="couple-photos-grid" class="photos-panel"></div>
+
+        </div>
+
+        <!-- SELETOR DE CATEGORIAS DO CASAL -->
+        <div class="couple-cat-bar">
+          <div class="cat-buttons" id="couple-cat-tabs">
+            <button class="cat-btn active" data-cat="viagens">
+              <i data-lucide="plane"></i> <span>VIAGENS</span> <b id="cnt-viagens">0</b>
+            </button>
+            <button class="cat-btn" data-cat="restaurantes">
+              <i data-lucide="utensils"></i> <span>RESTAURANTES</span> <b id="cnt-restaurantes">0</b>
+            </button>
+            <button class="cat-btn" data-cat="filmes">
+              <i data-lucide="clapperboard"></i> <span>FILMES & SÉRIES</span> <b id="cnt-filmes">0</b>
+            </button>
+            <button class="cat-btn" data-cat="jogos">
+              <i data-lucide="gamepad-2"></i> <span>JOGOS</span> <b id="cnt-jogos">0</b>
+            </button>
+          </div>
+
+          <button id="random-btn" class="btn-red">
+            <i data-lucide="dices"></i> <span>SORTEAR PENDENTE</span>
+          </button>
+        </div>
+
+        <!-- Resultado do Sorteio -->
+        <div id="random-drawer" class="random-drawer hidden">
+          <div>
+            <span class="mono red-text">// SORTEIO AUTOMÁTICO:</span>
+            <h3 id="random-pick-title"></h3>
+            <p id="random-pick-notes" class="muted"></p>
+          </div>
+          <button id="close-random" class="btn-icon">&times;</button>
+        </div>
+
+        <!-- FORMULÁRIO DE ADIÇÃO -->
+        <form id="add-couple-form" class="cyber-card form-grid">
+          <input type="text" id="c-title" placeholder="Nome / Destino" required>
+          <input type="text" id="c-meta" placeholder="Data / Estilo" required>
+          <input type="text" id="c-notes" placeholder="Notas ou detalhes...">
+          <input type="url" id="c-maps" class="hidden" placeholder="Link do Google Maps (https://maps...)">
+          <button type="submit" class="btn-red">
+            <i data-lucide="plus"></i> ADICIONAR
+          </button>
+        </form>
+
+        <!-- BARRA DE FILTROS E ORDENAÇÃO INTELIGENTE -->
+        <div class="smart-toolbar">
+          <div class="search-box">
+            <i data-lucide="search"></i>
+            <input type="text" id="couple-search" placeholder="Pesquisar na lista...">
+          </div>
+
+          <div class="toolbar-controls">
+            <div class="status-Segment" id="couple-status-filter">
+              <button type="button" class="seg-btn active" data-status="all">Todos</button>
+              <button type="button" class="seg-btn" data-status="pending">Pendentes</button>
+              <button type="button" class="seg-btn" data-status="done">Concluídos</button>
+            </div>
+
+            <select id="couple-sort" class="cyber-select">
+              <option value="pending-first">⚡ Pendentes Primeiro</option>
+              <option value="newest">🕒 Mais Recentes</option>
+              <option value="az">🔤 Ordem Alfabética (A-Z)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Barra de Progresso -->
+        <div class="cyber-progress">
+          <div class="progress-meta mono">
+            <span id="prog-label">PROGRESSO</span>
+            <span id="prog-pct" class="red-text">0%</span>
+          </div>
+          <div class="progress-track">
+            <div id="prog-bar" class="progress-fill"></div>
+          </div>
+        </div>
+
+        <!-- Grelha de Cartões da Categoria (Com Mini-Checklist nas Viagens) -->
+        <div id="couple-cards-grid" class="couple-cards-grid"></div>
+
+      </div>
+
+      <!-- SUB-VISTA 4.2: BIBLIOTECA CULTURAL -->
+      <div id="subview-shelf" class="subview-panel">
+        
+        <!-- MINI-ESTATÍSTICAS CULTURAIS (Apenas Concluídos/Vistos) -->
+        <div id="shelf-stats-bar" class="shelf-stats-grid"></div>
+
+        <!-- Abas de Temas da Biblioteca Cultural -->
+        <div class="couple-cat-bar">
+          <div class="cat-buttons" id="shelf-cat-tabs">
+            <button class="cat-btn active" data-shelf-cat="jogos">
+              <i data-lucide="gamepad-2"></i> <span>JOGOS</span> <b id="scnt-jogos">0</b>
+            </button>
+            <button class="cat-btn" data-shelf-cat="filmes">
+              <i data-lucide="film"></i> <span>FILMES</span> <b id="scnt-filmes">0</b>
+            </button>
+            <button class="cat-btn" data-shelf-cat="series">
+              <i data-lucide="tv"></i> <span>SÉRIES</span> <b id="scnt-series">0</b>
+            </button>
+            <button class="cat-btn" data-shelf-cat="concertos">
+              <i data-lucide="flame-kindling"></i> <span>CONCERTOS</span> <b id="scnt-concertos">0</b>
+            </button>
+          </div>
+        </div>
+
+        <!-- Formulário Dinâmico (Com Estado de Consumo e Poster/Capa) -->
+        <form id="add-shelf-form" class="cyber-card form-grid">
+          <input type="text" id="s-title" placeholder="Nome do Jogo" required>
+          <input type="text" id="s-meta" placeholder="Plataforma / Ano" required>
+          <select id="s-status" class="cyber-select">
+            <option value="completed" id="opt-status-done">✅ Terminado / Visto</option>
+            <option value="active" id="opt-status-active">🔥 A Jogar / A Ver Agora</option>
+          </select>
+          <select id="s-rating" class="cyber-select">
+            <option value="5">★★★★★ (5/5)</option>
+            <option value="4">★★★★☆ (4/5)</option>
+            <option value="3">★★★☆☆ (3/5)</option>
+            <option value="2">★★☆☆☆ (2/5)</option>
+            <option value="1">★☆☆☆☆ (1/5)</option>
+          </select>
+          <input type="url" id="s-cover" placeholder="URL Capa / Poster (opcional)">
+          <input type="text" id="s-review" placeholder="A tua nota ou memória..." required>
+          <button type="submit" class="btn-red">
+            <i data-lucide="plus"></i> REGISTAR
+          </button>
+        </form>
+
+        <!-- Pesquisa, Filtro de Consumo e Ordenação -->
+        <div class="smart-toolbar">
+          <div class="search-box">
+            <i data-lucide="search"></i>
+            <input type="text" id="shelf-search" placeholder="Filtrar nesta categoria...">
+          </div>
+          <div class="toolbar-controls">
+            <div class="status-Segment" id="shelf-status-filter">
+              <button type="button" class="seg-btn active" data-sstatus="all">Todos</button>
+              <button type="button" class="seg-btn" data-sstatus="active">Em Curso</button>
+              <button type="button" class="seg-btn" data-sstatus="completed">Concluídos</button>
+            </div>
+            <select id="shelf-sort" class="cyber-select">
+              <option value="active-first">🔥 Em Curso Primeiro</option>
+              <option value="rating">⭐ Melhor Classificação</option>
+              <option value="newest">🕒 Mais Recentes</option>
+              <option value="az">🔤 Ordem Alfabética (A-Z)</option>
+            </select>
+          </div>
+        </div>
+
+        <!-- Grelha de Cartões da Biblioteca Cultural -->
+        <div id="shelf-grid" class="projects-grid"></div>
+      </div>
+
+      <!-- SUB-VISTA 4.3: CMS ADMIN -->
+      <div id="subview-cms" class="subview-panel">
+        <div class="cyber-card" style="padding: 1.5rem;">
+          <span class="mono red-text">// ADMIN CMS</span>
+          <h3 style="margin: 0.4rem 0 1rem;">ADICIONAR PROJETO AO PORTEFÓLIO (COM CASE STUDY)</h3>
+          <form id="add-project-form" class="cms-stack">
+            <div class="cms-row">
+              <input type="text" id="p-title" placeholder="Nome do Projeto" required>
+              <input type="text" id="p-cat" placeholder="Categoria (ex: Embedded, Web, Android)" required>
+            </div>
+            <input type="url" id="p-img" placeholder="URL da Imagem de Capa (https://...)" required>
+            <textarea id="p-desc" rows="2" placeholder="Resumo curto para o cartão..." required></textarea>
+            <textarea id="p-problem" rows="2" placeholder="Problema que resolve (Case Study)..."></textarea>
+            <textarea id="p-arch" rows="2" placeholder="Arquitetura Técnica (Case Study)..."></textarea>
+            <textarea id="p-challenges" rows="2" placeholder="Desafios superados (Case Study)..."></textarea>
+            <div class="cms-row">
+              <input type="text" id="p-stack" placeholder="Stack separada por vírgulas (C++, ESP32, Kotlin)" required>
+              <select id="p-status" class="cyber-select">
+                <option value="Concluído">Concluído</option>
+                <option value="Em Desenvolvimento">Em Desenvolvimento</option>
+              </select>
+            </div>
+            <button type="submit" class="btn-red">PUBLICAR NO PORTEFÓLIO</button>
+          </form>
+        </div>
+      </div>
+
+    </section>
+
+  </main>
+
+  <footer class="footer">
+    <div class="container footer-flex mono">
+      <span>JUSTGUERREIRO // DIOGO GUERREIRO © 2026</span>
+      <span class="muted">LOGIN: <kbd>SHIFT+L</kbd> // TERMINAL: <kbd>ALT+T</kbd></span>
+    </div>
+  </footer>
+
+  <!-- ==================== MODAL DE CASE STUDY DOS PROJETOS ==================== -->
+  <div id="case-study-modal" class="modal-overlay hidden">
+    <div class="cyber-modal modal-lg">
+      <button class="modal-close" id="close-case-modal">&times;</button>
+      <div id="case-study-content"></div>
+    </div>
+  </div>
+
+  <!-- ==================== MINI TERMINAL CYBERPUNK INTERATIVO ==================== -->
+  <div id="terminal-modal" class="modal-overlay hidden">
+    <div class="cyber-terminal">
+      <div class="terminal-topbar">
+        <span class="mono"><span class="red-text">root@justguerreiro</span>:~# bash</span>
+        <button class="modal-close" id="close-terminal" style="position:static; font-size:1.3rem;">&times;</button>
+      </div>
+      <div id="terminal-output" class="terminal-body mono">
+        <div>JUSTGUERREIRO OS v2.6 // SYS.READY</div>
+        <div class="muted">Escreve <span class="red-text">help</span> para veres a lista de comandos disponíveis.</div>
+      </div>
+      <form id="terminal-form" class="terminal-input-row mono">
+        <span class="red-text">jg@sys:~$</span>
+        <input type="text" id="terminal-input" placeholder="help, whoami, skills, projects, contact, clear..." autocomplete="off">
+      </form>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL DE LOGIN ==================== -->
+  <div id="login-modal" class="modal-overlay hidden">
+    <div class="cyber-modal">
+      <button class="modal-close" id="close-login">&times;</button>
+      <div class="modal-head">
+        <div class="brand-badge">JG</div>
+        <h3>AUTENTICAÇÃO PRIVADA</h3>
+        <p class="mono muted">Introduz o teu username para desbloquear.</p>
+      </div>
+
+      <form id="login-form">
+        <label class="mono">USERNAME</label>
+        <input type="text" id="login-user" placeholder="JustGuerreiro ou Amor" autocomplete="username" required>
+
+        <label class="mono">PASSWORD</label>
+        <input type="password" id="login-pass" placeholder="•••" autocomplete="current-password" required>
+
+        <p id="login-err" class="err-text mono hidden">>> ERRO: CREDENCIAIS INVÁLIDAS</p>
+
+        <button type="submit" class="btn-red full-w" style="margin-top: 1.2rem;">ENTRAR NO SISTEMA</button>
+      </form>
+
+      <div class="quick-access">
+        <span class="mono muted">// ACESSO RÁPIDO (TESTE):</span>
+        <div class="quick-grid">
+          <button type="button" class="btn-outline btn-sm" data-quick-user="JustGuerreiro">
+            ⚡ JustGuerreiro
+          </button>
+          <button type="button" class="btn-outline btn-sm" data-quick-user="Amor">
+            ❤️ Amor
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ==================== MODAL DE EDIÇÃO DAS FOTOS DO CASAL ==================== -->
+  <div id="photo-modal" class="modal-overlay hidden">
+    <div class="cyber-modal">
+      <button class="modal-close" id="close-photo-modal">&times;</button>
+      <div class="modal-head">
+        <span class="mono red-text">// PERSONALIZAR MURAL</span>
+        <h3>ALTERAR FOTOGRAFIA</h3>
+      </div>
+
+      <form id="photo-form">
+        <input type="hidden" id="photo-slot-id">
+
+        <label class="mono">1. ESCOLHER FOTO DO TELEMÓVEL / PC</label>
+        <input type="file" id="photo-file-input" accept="image/*" class="file-input">
+
+        <label class="mono">OU 2. COLAR LINK DIRETO DE IMAGEM</label>
+        <input type="url" id="photo-url-input" placeholder="https://...">
+
+        <label class="mono">LEGENDA DA FOTO</label>
+        <input type="text" id="photo-caption-input" placeholder="Ex: Viagem ao Norte // 2026" required>
+
+        <button type="submit" class="btn-red full-w" style="margin-top: 1.2rem;">GUARDAR FOTOGRAFIA</button>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast-box" class="toast-box"></div>
+
+  <script type="module" src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,18 @@
+{
+  "name": "JustGuerreiro // Diogo Guerreiro",
+  "short_name": "JustGuerreiro",
+  "description": "Portefólio de Engenharia, Setup e Espaço Pessoal de Diogo Guerreiro.",
+  "start_url": "./index.html",
+  "display": "standalone",
+  "background_color": "#070709",
+  "theme_color": "#e11d48",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' fill='%23070709'/><rect x='4' y='4' width='92' height='92' fill='none' stroke='%23e11d48' stroke-width='8'/><text x='50%' y='55%' dominant-baseline='middle' text-anchor='middle' fill='%23f4f4f6' font-family='monospace' font-weight='bold' font-size='44'>JG</text></svg>",
+      "sizes": "192x192 512x512",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
